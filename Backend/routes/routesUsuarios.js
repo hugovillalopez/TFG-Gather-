@@ -1,27 +1,109 @@
-const express = require('express');
+import express from 'express'
 
 const router = express.Router()
 //const Usuarios = mongoose.model('usuarios')
-const Usuario = require('../models/usuarios');
-const { default: mongoose } = require('mongoose');
+import Usuario from '../models/usuarios.js'; // Si el archivo tiene exportación por defecto
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-module.exports = router;
+export default router;
 
 //Post Method
 router.post('/postUsuario', async (req, res) => {
-   const usuario = new Usuario({
-    nombre:req.body.nombre,
-    edad:req.body.edad,
-    correo:req.body.correo,
-    password:req.body.password,
-   })
-   try {
+    const username = req.body.username;
+    const correo = req.body.correo;
+    const numeroTlf = req.body.numeroTlf;
+    
+    
+    try {
+        // Verificar si el usuario, correo o número de teléfono ya existen
+        const usernameExiste = await Usuario.findOne({ username });
+        const numeroTlfExiste = await Usuario.findOne({ numeroTlf });
+        const correoExiste = await Usuario.findOne({ correo });
+        
+    
+        if (usernameExiste || correoExiste || numeroTlfExiste) {
+            return res.status(400).json({ message: "Username, correo o número de teléfono ya en uso" });
+        }
+    
+        // Encriptar la contraseña
+        const saltRounds = 10; 
+        const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+    
+        // Crear el nuevo usuario
+        const usuario = new Usuario({
+            nombre: req.body.nombre,
+            apellido: req.body.apellido,
+            username: req.body.username,
+            correo: req.body.correo,
+            password: hashedPassword,
+            fechaNacimiento: req.body.fechaNacimiento,
+            numeroTlf: req.body.numeroTlf,
+            quedadasCreadas: req.body.quedadasCreadas || [],
+            quedadasAsistidas: req.body.quedadasAsistidas || [],
+            amigos: req.body.amigos || [],
+            seguidos: req.body.seguidos || [],
+            seguidores: req.body.seguidores || [],
+        });
+    
+        // Guardar el usuario en la base de datos
         const usuarioToSave = await usuario.save();
-        res.status(200).json(usuarioToSave)
-   } catch (error) {
-        res.status(400).json({message: error.message})
-   }
+        res.status(200).json(usuarioToSave);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+    
 })
+
+const token_secret = "t$q*H^FIT@B04TAnk#%yr^Vt195B!7z&*63i@uWC^39ed*p2a4"
+
+function verificarToken(req, res, next) { 
+     const token = req.headers.authorization
+    if (!token) { 
+        return res.status(401).json({message : "Token no recibido"});
+    } 
+    jwt.verify(token, token_secret, (err, decoded) => { 
+        if (err) { 
+            return res.status(401).json({ message: `Token inválido` }); 
+        } 
+        req.user = decoded; 
+        next();
+    });
+}
+
+router.get('/protected', verificarToken, (req, res) => { 
+    
+    res.json({ mensaje: 'Acceso Permitido', usuario: req.user, autenticado: true }); 
+});
+
+router.post('/login', async (req, res) => {
+    const username = req.body.username
+    const password = req.body.password 
+    try {
+         const usuario = await Usuario.findOne({ username });
+         if (!usuario) {
+            return res.status(400).json({message: "Username incorrecto"})
+         }else{
+            const isMatch = await bcrypt.compare(password, usuario.password);
+            if (!isMatch) {
+                return res.status(400).json({ message: 'Contraseña incorrecta' });
+                
+            }else{
+                const token = jwt.sign(
+                    { id: usuario._id, username: usuario.username },
+                    token_secret, // Usa una clave secreta segura
+                    { expiresIn: '1h' }
+                );
+                res.json({token})
+                
+            }
+         }
+
+    } catch (error) {
+         res.status(400).json({message: error.message})
+    }
+ })
 
 //Get all Method
 router.get('/usuarios', async (req, res) => {
@@ -42,6 +124,17 @@ router.get('/usuario/:id', async (req, res) => {
         res.status(400).json({ message: error.message }); 
     }
 })
+
+router.post('/buscarUsuarios', async (req,res) => {
+    const username = req.body.username
+    try {
+        const usuarios = await Usuario.find({ username: { $regex: `^${username}`, $options: 'i' } })
+        res.status(200).json(usuarios)
+    } catch (error) {
+        res.status(400).json({ message: error.message }); 
+    }
+})
+
 
 //Update by ID Method
 router.patch('/putUsuarios/:id', async (req, res) => {

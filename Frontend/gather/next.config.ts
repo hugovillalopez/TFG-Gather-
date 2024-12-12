@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
       { 
         source: '/gather/:path*', 
         destination: 'http://localhost:3001/gather/:path*', // Cambia esto a la dirección de tu servidor de Express }, ]; },
-      }
+      },
+    
     ];
   }
 }

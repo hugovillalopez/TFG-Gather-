@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const Quedada = new mongoose.Schema({
     fecha: {
@@ -27,4 +27,4 @@ const Quedada = new mongoose.Schema({
     },
 })
 
-module.exports = mongoose.model('Quedadas', Quedada)
+export default mongoose.model('Quedadas', Quedada);

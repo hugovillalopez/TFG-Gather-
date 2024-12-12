@@ -1,11 +1,12 @@
-const express = require('express');
+import express from 'express'
 
 const router = express.Router()
 
-const Quedada = require('../models/quedadas');
-const { default: mongoose } = require('mongoose');
 
-module.exports = router;
+import Quedada from '../models/quedadas.js'
+import mongoose from 'mongoose';
+
+export default router;
 
 //Post Method
 router.post('/postQuedada', async (req, res) => {

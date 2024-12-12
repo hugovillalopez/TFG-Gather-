@@ -18,6 +18,21 @@ export const fetchUsuarioById = async (id) => {
   return data;
 };
 
+export const fetchUsuariosByUsername = async (username) => {
+  const response = await fetch(`${API_URL}/gather/buscarUsuarios`,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(username),
+  });
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  const data = await response.json();
+  return data;
+};
+
 export const createUsuarios = async (usuario) => {
   const response = await fetch(`${API_URL}/gather/postUsuario`, {
     method: 'POST',
@@ -32,6 +47,37 @@ export const createUsuarios = async (usuario) => {
   const data = await response.json();
   return data;
 };
+
+export const loggear = async (usuario) => {
+  const response = await fetch(`${API_URL}/gather/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(usuario),
+  });
+  if (!response.ok) {
+    const errorDetails = await response.json();
+    throw new Error(`Network response was not ok: ${errorDetails.message || response.statusText}`);
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const verificarId = async (token) =>{
+  sessionStorage.setItem(`token`,token)
+    const response = await fetch(`${API_URL}/gather/protected`, {
+      headers: {
+        'Authorization': token
+      }
+    })
+    if (!response.ok) {
+      const errorDetails = await response.json();
+      throw new Error(`Network response was not ok: ${errorDetails.message || response.statusText}`);
+    }
+    const data = await response.json();
+    return data;
+}
 
 export const updateUsuario = async (id, Usuario) => {
   const response = await fetch(`${API_URL}/gather/putUsuarios/${id}`, {
