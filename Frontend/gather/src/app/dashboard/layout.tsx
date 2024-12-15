@@ -3,6 +3,9 @@ import '@mantine/core/styles.css'
 import Link from "next/link";
 import {ProtectedRoute} from './protectedRoutes';
 import '../globals.css'
+import { Grid, MantineProvider } from '@mantine/core';
+import Menu from './menu';
+import Buscador from './buscador';
 
 export default function RootLayout({
   children,
@@ -29,7 +32,14 @@ export default function RootLayout({
           </div>
         </nav>
           <ProtectedRoute>
-          {children}
+            <MantineProvider>
+              <Grid align="stretch" className="pt-6">
+                <Grid.Col span={2.5}><Menu/></Grid.Col>
+                <Grid.Col className="rounded overflow-hidden shadow-lg dark:bg-gray-800 bg-gray-200" span={6}>{children}</Grid.Col>
+                <Grid.Col span={3.5}><Buscador/></Grid.Col>
+              </Grid>
+            </MantineProvider>
+          
     </ProtectedRoute>
 
       </body>

@@ -116,11 +116,21 @@ router.get('/usuarios', async (req, res) => {
 })
 
 //Get by ID Method
-router.get('/usuario/:id', async (req, res) => {
+router.post('/usuario', async (req, res) => {
     try { 
-        const usuario = await Usuario.findById(req.params.id); 
+        const usuario = await Usuario.findById(req.body.id); 
         res.status(200).json(usuario); 
     } catch (error) { 
+        res.status(400).json({ message: error.message }); 
+    }
+})
+
+router.post('/mostrarUsuario', async (req,res) => {
+    const username = req.body.username
+    try {
+        const usuario = await Usuario.findOne({ username })
+        res.status(200).json(usuario)
+    } catch (error) {
         res.status(400).json({ message: error.message }); 
     }
 })

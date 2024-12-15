@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { fetchUsuarioById, fetchUsuariosByUsername } from "../lib/usuarios"
+import Link from "next/link"
 
 
 export default function Buscador(){
@@ -49,18 +50,20 @@ export default function Buscador(){
     return (
         
     <div className="p-8">
-
-        <div className="justify-end flex items-center gap-4">
-            <img src="https://docs.material-tailwind.com/img/face-2.jpg" alt="avatar" className="inline-block relative object-cover object-center !rounded-full w-12 h-12" />
-            <div>
-            <h6 className="text-slate-800 dark:text-gray-300 font-semibold">
-                {usuario.username}
-            </h6>
-            <p className="text-slate-600 text-sm dark:text-gray-500">
-                {usuario.nombre} {usuario.apellido}
-            </p>
+        <Link href={`/dashboard/${usuario.username}`}>
+            <div className=" flex items-center gap-4">
+                <img src="../images/gatherLogo.png" alt="avatar" className="inline-block relative object-cover object-center !rounded-full w-12 h-12" />
+                <div className="justify-start">
+                <h6 className="text-slate-800 dark:text-gray-300 font-semibold">
+                    {usuario.username}
+                </h6>
+                <p className="text-slate-600 text-sm dark:text-gray-500">
+                    {usuario.nombre} {usuario.apellido}
+                </p>
+                </div>
+                
             </div>
-        </div>
+        </Link>
 
         <hr className="border-orange-400  my-4" />
 
@@ -77,7 +80,7 @@ export default function Buscador(){
             {usuariosEncontrados.map((usuario) => (
                 
                 <div key={usuario._id} className="justify-start flex items-center gap-4 pl-4 p-4 hover:bg-orange-400">
-                    <img src="https://docs.material-tailwind.com/img/face-2.jpg" alt="avatar" className="inline-block relative object-cover object-center !rounded-full w-12 h-12" />
+                    <img src="./images/gatherLogo.png" alt="avatar" className="inline-block relative object-cover object-center !rounded-full w-12 h-12" />
                     <div>
                     <h6 className="text-slate-800 dark:text-gray-300 font-semibold">
                         {usuario.username}

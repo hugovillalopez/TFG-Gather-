@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 
 export default function Menu(){
     const pathname = window.location.pathname
-    console.log(pathname)
     return(
         <div className="flex flex-1 bg-trasparent justify-center">
     <div className="hidden md:flex md:w-64 md:flex-col">

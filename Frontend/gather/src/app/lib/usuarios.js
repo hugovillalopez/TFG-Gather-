@@ -10,7 +10,31 @@ export const fetchUsuarios = async () => {
 };
 
 export const fetchUsuarioById = async (id) => {
-  const response = await fetch(`${API_URL}/gather/usuario/${id}`);
+  const dato = {
+    id: id
+  }
+  const response = await fetch(`${API_URL}/gather/usuario`,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(dato),
+  });
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const fetchUsuarioByUsername = async (username) => {
+  const response = await fetch(`${API_URL}/gather/mostrarUsuario`,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(username),
+  });
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
