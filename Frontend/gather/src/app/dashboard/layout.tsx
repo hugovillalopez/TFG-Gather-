@@ -32,13 +32,32 @@ export default function RootLayout({
           </div>
         </nav>
           <ProtectedRoute>
-            <MantineProvider>
+            {/*<MantineProvider>
               <Grid align="stretch" className="pt-6">
                 <Grid.Col span={2.5}><Menu/></Grid.Col>
                 <Grid.Col className="rounded overflow-hidden shadow-lg dark:bg-gray-800 bg-gray-200" span={6}>{children}</Grid.Col>
                 <Grid.Col span={3.5}><Buscador/></Grid.Col>
               </Grid>
-            </MantineProvider>
+            </MantineProvider>*/}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-12 gap-4 pt-4">
+
+              <div className="lg:pl-20 sm:flex sm:flex-col sm:items-center sm:fixed sm:bottom-0 sm:left-0 sm:h-16 sm:w-full md:relative md:h-auto md:w-auto lg:col-span-2">
+                <Menu />
+              </div>
+
+              <div className="lg:ml-20 md:col-span-1 rounded overflow-hidden shadow-lg dark:bg-gray-800 bg-gray-200  lg:col-span-6">
+                {children}
+              </div>
+
+
+              <div className="ml-10 hidden md:block lg:col-span-4 ">
+                
+                <div className="text-center">
+                  <Buscador />
+                </div>
+              </div>
+            </div>
+
           
     </ProtectedRoute>
 

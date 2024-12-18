@@ -1,6 +1,7 @@
 "use client";
 import { createUsuarios } from "@/app/lib/usuarios";
 import { Card, MantineProvider } from "@mantine/core";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 
@@ -8,6 +9,7 @@ export default function Registrarse() {
 
     const formRef = useRef(null)
     const [errores,setErrores] = useState({})
+    const router = useRouter()
 
     
 
@@ -17,6 +19,7 @@ export default function Registrarse() {
 
             if (registro) {
                 console.log(registro)
+                router.push("/")
             }
         }catch(error){
             console.log(error.mensage)

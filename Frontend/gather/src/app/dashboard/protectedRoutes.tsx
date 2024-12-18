@@ -24,11 +24,13 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
             };
 
             verificar(token).then(dato => {
-                if (dato.autenticado === false) {
-                    router.push("/");
-                } else {
+             
+                if (dato.autenticado === true) {
+                    
                     sessionStorage.setItem("usuario",dato.usuario.id)
                     setVerificado(true);
+                } else {
+                    router.push("/");
                 }
             });
         } else {

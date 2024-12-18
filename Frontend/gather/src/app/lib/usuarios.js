@@ -103,6 +103,22 @@ export const verificarId = async (token) =>{
     return data;
 }
 
+export const seguir = async (datos) => {
+  const response = await fetch(`${API_URL}/gather/seguir`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(datos),
+  });
+  if (!response.ok) {
+    const errorDetails = await response.json();
+    throw new Error(`Network response was not ok: ${errorDetails.message || response.statusText}`);
+  }
+  const data = await response.json();
+  return data;
+};
+
 export const updateUsuario = async (id, Usuario) => {
   const response = await fetch(`${API_URL}/gather/putUsuarios/${id}`, {
     method: 'PATCH',

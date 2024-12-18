@@ -11,21 +11,21 @@ export default router;
 
 //Post Method
 router.post('/postUsuario', async (req, res) => {
-    const username = req.body.username;
+    /*const username = req.body.username;
     const correo = req.body.correo;
-    const numeroTlf = req.body.numeroTlf;
+    const numeroTlf = req.body.numeroTlf;*/
     
     
     try {
         // Verificar si el usuario, correo o número de teléfono ya existen
-        const usernameExiste = await Usuario.findOne({ username });
+        /*const usernameExiste = await Usuario.findOne({ username });
         const numeroTlfExiste = await Usuario.findOne({ numeroTlf });
-        const correoExiste = await Usuario.findOne({ correo });
+        const correoExiste = await Usuario.findOne({ correo });*/
         
     
-        if (usernameExiste || correoExiste || numeroTlfExiste) {
+        /*if (usernameExiste || correoExiste || numeroTlfExiste) {
             return res.status(400).json({ message: "Username, correo o número de teléfono ya en uso" });
-        }
+        }*/
     
         // Encriptar la contraseña
         const saltRounds = 10; 
@@ -58,7 +58,7 @@ router.post('/postUsuario', async (req, res) => {
 
 const token_secret = "t$q*H^FIT@B04TAnk#%yr^Vt195B!7z&*63i@uWC^39ed*p2a4"
 
-function verificarToken(req, res, next) { 
+ function verificarToken (req, res, next) { 
      const token = req.headers.authorization
     if (!token) { 
         return res.status(401).json({message : "Token no recibido"});
@@ -68,7 +68,14 @@ function verificarToken(req, res, next) {
             return res.status(401).json({ message: `Token inválido` }); 
         } 
         req.user = decoded; 
-        next();
+        const usuario =Usuario.findById(req.user._id)
+        console.log(usuario)
+        if (usuario != null) {
+           next(); 
+        } else{
+            return res.status(401).json({ message: `Token inválido` });
+        }
+        
     });
 }
 
@@ -143,6 +150,48 @@ router.post('/buscarUsuarios', async (req,res) => {
     } catch (error) {
         res.status(400).json({ message: error.message }); 
     }
+})
+
+router.post('/seguir',async (req,res) => {
+    const seguido = req.body.seguido
+    const seguidor = req.body.seguidor
+    const dejarSeguir = req.body.dejarSeguir
+    try {
+        if (seguido != seguidor) {
+
+            const seguidoExiste = await Usuario.findById(seguido)
+            const seguidorExiste = await Usuario.findById(seguidor)
+            if (!seguidoExiste || !seguidorExiste) {
+                res.status(400).json({message: "Usuario no encontrado"})
+            }
+
+            if (dejarSeguir) {
+                if (!seguidorExiste.seguidos.includes(seguidoExiste) || !seguidoExiste.seguidores.includes(seguidorExiste)) {
+                    res.status(400).json({message: "No lo estas siguiendo"})
+                }
+
+                seguidorExiste.seguidos.splice(seguidorExiste.seguidos.indexOf(seguido),1)
+                seguidoExiste.seguidores.splice(seguidoExiste.seguidores.indexOf(seguidor),1)
+            } else{
+                if (seguidorExiste.seguidos.includes(seguidoExiste) || seguidoExiste.seguidores.includes(seguidorExiste)) {
+                    res.status(400).json({message: "Ya esta seguido"})
+                }
+
+                seguidorExiste.seguidos.push(seguido)
+                seguidoExiste.seguidores.push(seguidor)
+            }
+
+            
+
+            await seguidoExiste.save()
+            await seguidorExiste.save()
+
+        }
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+    
+
 })
 
 
