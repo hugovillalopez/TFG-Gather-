@@ -2,6 +2,7 @@
 import { FC, useEffect, useState, ReactNode } from "react";
 import { verificarId } from "../lib/usuarios";
 import { useRouter } from "next/navigation";
+import { verificar } from "../funciones";
 
 interface ProtectedRouteProps {
     children: ReactNode;
@@ -14,20 +15,8 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         if (token) {
-            const verificar = async (token: string) => {
-                try {
-                    const envioToken = await verificarId(token);
-                    return envioToken;
-                } catch (error) {
-                    return { error: error.message };
-                }
-            };
-
             verificar(token).then(dato => {
-             
                 if (dato.autenticado === true) {
-                    
-                    sessionStorage.setItem("usuario",dato.usuario.id)
                     setVerificado(true);
                 } else {
                     router.push("/");

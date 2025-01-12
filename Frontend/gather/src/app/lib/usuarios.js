@@ -43,12 +43,15 @@ export const fetchUsuarioByUsername = async (username) => {
 };
 
 export const fetchUsuariosByUsername = async (username) => {
+  const dato = {
+    username: username
+  }
   const response = await fetch(`${API_URL}/gather/buscarUsuarios`,{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(username),
+    body: JSON.stringify(dato),
   });
   if (!response.ok) {
     throw new Error('Network response was not ok');
@@ -60,13 +63,11 @@ export const fetchUsuariosByUsername = async (username) => {
 export const createUsuarios = async (usuario) => {
   const response = await fetch(`${API_URL}/gather/postUsuario`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(usuario),
+    body: usuario,
   });
   if (!response.ok) {
-    throw new Error('Network response was not ok');
+    const errorData = await response.json();
+    throw new Error(errorData.message);
   }
   const data = await response.json();
   return data;
@@ -89,7 +90,7 @@ export const loggear = async (usuario) => {
 };
 
 export const verificarId = async (token) =>{
-  sessionStorage.setItem(`token`,token)
+    sessionStorage.setItem("token",token)
     const response = await fetch(`${API_URL}/gather/protected`, {
       headers: {
         'Authorization': token
@@ -103,7 +104,12 @@ export const verificarId = async (token) =>{
     return data;
 }
 
-export const seguir = async (datos) => {
+export const seguir = async (seguido, seguidor, dejarSeguir) => {
+  const datos = {
+    seguido: seguido,
+    seguidor: seguidor,
+    dejarSeguir: dejarSeguir
+}
   const response = await fetch(`${API_URL}/gather/seguir`, {
     method: 'POST',
     headers: {
@@ -134,8 +140,8 @@ export const updateUsuario = async (id, Usuario) => {
   return data;
 };
 
-export const deleteQuedada = async (id) => {
-  const response = await fetch(`${API_URL}/gather/deleteQuedada/${id}`, {
+export const deleteUsuario = async (id) => {
+  const response = await fetch(`${API_URL}/gather/deleteUsuario/${id}`, {
     method: 'DELETE',
   });
   if (!response.ok) {

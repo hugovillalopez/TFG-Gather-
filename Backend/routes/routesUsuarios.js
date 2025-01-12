@@ -8,24 +8,63 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 export default router;
+import multer from 'multer'
+import multerS3 from 'multer-s3'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+
+
+
+// Configurar el SDK de AWS
+const s3Client = new S3Client({
+    region: 'eu-north-1', // Región de tu bucket
+    credentials: {
+      accessKeyId: 'AKIA3ISBVXXIWGW6AROY',
+      secretAccessKey: '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',
+    },
+})
+// Crear una instancia de S3
+const upload = multer({
+    storage: multerS3({
+      s3: s3Client, // Cambiar a la nueva instancia de S3Client
+      bucket: 'gather-7308', // Nombre de tu bucket S3
+      metadata: function (req, file, cb) {
+        cb(null, { fieldName: file.fieldname });
+      },
+      key: function (req, file, cb) {
+        cb(null, `uploads/${Date.now().toString()}-${file.originalname}`); // Nombre único para el archivo
+      }
+    })
+  })
 
 //Post Method
-router.post('/postUsuario', async (req, res) => {
-    /*const username = req.body.username;
+router.post('/postUsuario',upload.single('fotoPerfil'), async (req, res) => {
+    const username = req.body.username;
     const correo = req.body.correo;
-    const numeroTlf = req.body.numeroTlf;*/
-    
+    const numeroTlf = req.body.numeroTlf;
     
     try {
         // Verificar si el usuario, correo o número de teléfono ya existen
-        /*const usernameExiste = await Usuario.findOne({ username });
+        const usernameExiste = await Usuario.findOne({ username });
         const numeroTlfExiste = await Usuario.findOne({ numeroTlf });
-        const correoExiste = await Usuario.findOne({ correo });*/
+        const correoExiste = await Usuario.findOne({ correo });
         
     
-        /*if (usernameExiste || correoExiste || numeroTlfExiste) {
-            return res.status(400).json({ message: "Username, correo o número de teléfono ya en uso" });
-        }*/
+        if (usernameExiste) {
+            return res.status(400).json({ message: "Username ya en uso" });
+        }
+         
+        if (numeroTlfExiste) {
+            return res.status(400).json({ message: "Ya hay otra cuenta con este telefono" });
+        }
+
+        if (correoExiste) {
+            return res.status(400).json({ message: "Ya hay otra cuenta con este correo" });
+        }
+        let fotoUrl = '/images/users.webp';
+        if (req.file) {
+            fotoUrl = req.file.location;
+        }
+          
     
         // Encriptar la contraseña
         const saltRounds = 10; 
@@ -42,9 +81,11 @@ router.post('/postUsuario', async (req, res) => {
             numeroTlf: req.body.numeroTlf,
             quedadasCreadas: req.body.quedadasCreadas || [],
             quedadasAsistidas: req.body.quedadasAsistidas || [],
-            amigos: req.body.amigos || [],
+            solicitudes: req.body.solicitudes || [],
             seguidos: req.body.seguidos || [],
             seguidores: req.body.seguidores || [],
+            equipos: req.body.equipos || [],
+            foto:fotoUrl,
         });
     
         // Guardar el usuario en la base de datos
@@ -68,8 +109,7 @@ const token_secret = "t$q*H^FIT@B04TAnk#%yr^Vt195B!7z&*63i@uWC^39ed*p2a4"
             return res.status(401).json({ message: `Token inválido` }); 
         } 
         req.user = decoded; 
-        const usuario =Usuario.findById(req.user._id)
-        console.log(usuario)
+        const usuario = Usuario.findById(req.user._id)
         if (usuario != null) {
            next(); 
         } else{
@@ -162,19 +202,19 @@ router.post('/seguir',async (req,res) => {
             const seguidoExiste = await Usuario.findById(seguido)
             const seguidorExiste = await Usuario.findById(seguidor)
             if (!seguidoExiste || !seguidorExiste) {
-                res.status(400).json({message: "Usuario no encontrado"})
+                return res.status(400).json({message: "Usuario no encontrado"})
             }
 
             if (dejarSeguir) {
-                if (!seguidorExiste.seguidos.includes(seguidoExiste) || !seguidoExiste.seguidores.includes(seguidorExiste)) {
-                    res.status(400).json({message: "No lo estas siguiendo"})
+                if (!seguidorExiste.seguidos.includes(seguido) || !seguidoExiste.seguidores.includes(seguidor)) {
+                    return res.status(400).json({message: "No lo estas siguiendo"})
                 }
 
                 seguidorExiste.seguidos.splice(seguidorExiste.seguidos.indexOf(seguido),1)
                 seguidoExiste.seguidores.splice(seguidoExiste.seguidores.indexOf(seguidor),1)
             } else{
-                if (seguidorExiste.seguidos.includes(seguidoExiste) || seguidoExiste.seguidores.includes(seguidorExiste)) {
-                    res.status(400).json({message: "Ya esta seguido"})
+                if (seguidorExiste.seguidos.includes(seguido) || seguidoExiste.seguidores.includes(seguidor)) {
+                    return res.status(400).json({message: "Ya esta seguido"})
                 }
 
                 seguidorExiste.seguidos.push(seguido)
@@ -214,3 +254,23 @@ router.delete('/deleteUsuario/:id', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 })
+
+// Endpoint para subir archivos
+router.post('/upload', upload.single('file'), (req, res) => {
+  try {
+    if (req.file) {
+        // La URL pública del archivo subido a S3
+        const fileUrl = req.file.location;
+        
+        res.status(200).json({
+        message: 'Archivo subido exitosamente',
+        fileUrl: fileUrl
+        });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Error al subir el archivo');
+  }
+
+});
+

@@ -1,11 +1,19 @@
 import mongoose from 'mongoose';
 
 const Quedada = new mongoose.Schema({
+    nombre: {
+        required: true,
+        type: String
+    },
     fecha: {
         required: true,
         type: String
     },
-    hora: {
+    horaInicio: {
+        required: true,
+        type: String
+    },
+    horaFin: {
         required: true,
         type: String
     },
@@ -22,9 +30,27 @@ const Quedada = new mongoose.Schema({
         type: String
     },
     valoracion: {
+        type: String
+    },
+    visibilidad: {
         required: true,
         type: String
     },
+    
+    minAsistentes: {
+        required: true,
+        type: String
+    },
+    maxAsistentes: {
+        required: true,
+        type: String
+    },
+    usuariosAsistentes: {
+        type: [String]
+    },
+    equipo: {
+        type: [String]
+    }
 })
 
 export default mongoose.model('Quedadas', Quedada);

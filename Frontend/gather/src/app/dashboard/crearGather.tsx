@@ -1,0 +1,330 @@
+import { useCallback, useEffect, useRef, useState } from "react"
+import { fetchUsuarioById, verificarId } from "../lib/usuarios";
+import { createQuedada } from "../lib/quedadas";
+import { useRouter } from "next/navigation";
+import deportes from "./deportes";
+import { buscarUsuarioId, conseguirEquipos, verificar } from "../funciones";
+import MapComponent from "../maps";
+import { debounce } from "lodash";
+import _ from "lodash";
+
+
+export default function CrearGather ({onClose}) {
+    const [usuarioLogueado,setUsuarioLogueado] = useState({})
+    const [errores,setErrores] = useState({})
+    const [direccion,setDireccion] = useState('')
+    const listaDeportes = deportes.sort()
+    const formRef = useRef(null)
+    const router = useRouter()
+    const [mostrarErrores,setMostrarErrores] = useState(false)
+    const [mostrarEquipos,setMostrarEquipos] = useState(false)
+    const [Equipos,setEquipos] = useState([])
+    const hoy = new Date(); 
+    const mañana = new Date(hoy); 
+    mañana.setDate(hoy.getDate() + 1); 
+    const fechaLimite = new Date(hoy); 
+    fechaLimite.setFullYear(hoy.getFullYear() + 1);
+
+
+    const crear = async (quedada) =>{
+        try {
+            const response = await Promise.all([createQuedada(quedada)])
+            console.log(response)
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    const Validar = (e) =>{
+        e.preventDefault()
+        e.target.blur()
+
+        const form = formRef.current
+
+        const datos = {
+            nombre: form.nombre.value,
+            fecha: form.fecha.value,
+            horaInicio: form.horaInicio.value,
+            horaFin: form.horaFin.value,
+            lugar: form.lugar.value,
+            usuario: usuarioLogueado._id,
+            deporte: form.deporte.value,
+            visibilidad: form.visibilidad.value,
+            minAsistentes: form.minAsistentes.value,
+            maxAsistentes: form.maxAsistentes.value,
+        }
+
+        let error = false
+        let erroresTemp = {}
+        let equipos = []
+
+        Object.keys(datos).forEach((e) =>{
+            
+            switch (e) {
+                case 'nombre':
+                    if(datos[e].match(/^[A-Za-z0-9\s]+$/) == null || datos[e] == ""){
+                        error = true
+                        datos[e].placeholder = `Campo NOMBRE vacio`
+                        erroresTemp[e] = "Campo NOMBRE no correcto o vacio"
+                    }
+                    break;
+                case 'fecha':
+                    const fecha = new Date(datos[e])
+                    if(fecha < mañana && fecha > fechaLimite || datos[e] == ""){
+                        error = true
+                        datos[e].placeholder = `Campo FECHA vacio`
+                        erroresTemp[e] = "Campo FECHA no correcto o vacio"
+                    }  
+                    break;
+                case 'horaInicio':
+                    if(datos[e].match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/) == null || datos[e] == ""){
+                        error = true
+                        datos[e].placeholder = `Campo HORA DE INICIO vacio`
+                        erroresTemp[e] = "Campo HORA DE INICIO no correcto o vacio"
+                    }
+                    break;
+                case 'horaFin':
+                    if(datos[e].match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/) == null || datos[e] == ""){
+                        error = true
+                        datos[e].placeholder = `Campo HORA DE FINALIZACION vacio`
+                        erroresTemp[e] = "Campo HORA DE FINALIZACION no correcto o vacio"
+                    }
+                    
+                    break;
+                case 'lugar':
+                    if(datos[e] == ""){
+                        error = true
+                        datos[e].placeholder = `Campo LUGAR vacio`
+                        erroresTemp[e] = "Campo LUGAR no correcto o vacio"
+                    }
+                    break;
+                case 'deporte':
+                    if(datos[e] == ""){
+                        error = true
+                        datos[e].placeholder = `Campo DEPORTE vacio`
+                        erroresTemp[e] = "Campo DEPORTE no correcto o vacio"
+                    }
+                    
+                    break;
+                case 'minAsistentes':
+                    if(datos[e].match(/^[0-9]{1,2}$/) == null || datos[e] == ""){
+                        error = true
+                        datos[e].placeholder = `Campo MINIMO DE ASISTENTES vacio`
+                        erroresTemp[e] = "Campo MINIMO DE ASISTENTES no correcto o vacio"
+                    }
+                    
+                    break;
+                case 'maxAsistentes':
+                    if(datos[e].match(/^[0-9]{1,3}$/) == null || datos[e] == "" || parseInt(datos[e],10) < parseInt(datos['minAsistentes'],10)){
+                        error = true
+                        datos[e].placeholder = `Campo MÁXIMO DE ASISTENTES vacio`
+                        erroresTemp[e] = "Campo MÁXIMO DE ASISTENTES no correcto o vacio"
+                    }
+                    
+                    break;
+                case 'visibilidad':
+                    if(datos[e] != "Publico" && datos[e] != "Seguidores" && datos[e] != "Equipo"){
+                        console.log(datos[e])
+                        error = true
+                        erroresTemp[e] = "Campo VISIBILIDAD no correcto o vacio"
+                    }
+                        
+                    break;
+                default:
+                    break;
+            }
+        })
+
+        if (!error) {
+            const inicio = new Date(`1970-01-01T${datos['horaInicio']}:00`); 
+            const fin = new Date(`1970-01-01T${datos['horaFin']}:00`);
+            if (inicio > fin) {
+                erroresTemp['horas'] = "HORA DE INICIO es mas tarde a la de FINALIZACION"
+                setErrores(erroresTemp)
+            } else {
+                const unaHoraMasTarde = new Date(inicio); 
+                unaHoraMasTarde.setHours(inicio.getHours() + 1);
+                if (fin < unaHoraMasTarde) {
+                    erroresTemp['horas'] = "HORA DE FINALIZACION es mas pronto a una hora de la de INICIO"
+                    setErrores(erroresTemp)
+                }else{
+                    if (datos.visibilidad == "Equipo") {
+                        if (form.equipo != undefined) {
+                            
+                            form.equipo.forEach(checkbox => {
+                                console.log(checkbox)
+                                if (checkbox.checked) {
+                                    equipos.push(checkbox.value)
+                                }
+                            });
+                            console.log(equipos)
+                            if (equipos.length == 0) {
+                                erroresTemp['equipos'] = "No has seleccionado ningun EQUIPO"
+                                setErrores(erroresTemp)
+                                setMostrarErrores(true)
+                            } else {
+                                datos.equipos = equipos
+                                crear(datos)
+                                window.location.reload()
+                            }
+                        }
+                    }
+                    //crear(datos)
+                    //window.location.reload()
+                    
+                }
+            }
+        }else{
+            setErrores(erroresTemp)
+            setMostrarErrores(true)
+        }
+
+    }
+
+    const handleChange = (e) =>{
+        if (e.target.value == "Equipo") {
+            console.log(e.target.value)
+            setMostrarEquipos(true)
+        }
+    }
+
+    useEffect(()=>{
+        const token = sessionStorage.getItem("token");
+            if (token) {
+                verificar(token).then(dato =>{
+                buscarUsuarioId(dato.usuario.id).then(dato =>{
+                    setUsuarioLogueado(dato)
+                })
+            })
+        }
+        
+    },[])
+
+    useEffect(() =>{
+        conseguirEquipos(usuarioLogueado).then(equipos => setEquipos(equipos))
+        
+    },[usuarioLogueado])
+
+    return (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                <div className="overflow-auto rounded-lg shadow-lg p-6 w-1/3 dark:bg-gray-800 bg-gray-100 h-5/6 w-3/6 text-gray-800 dark:text-gray-300">
+                    <div className="mb-5 flex flex-row items-center w-full justify-between">
+                        <div className="mb-2 flex flex-row items-center">
+                            <h1 className="text-xl font-bold text-black capitalize dark:text-gray-200">Crear Gather</h1>
+                        </div>
+                        <div className="mb-2 flex flex-row items-center">
+                            <button className="rounded " onClick={onClose}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </button> 
+                        </div>
+                    </div> 
+                    <div>
+                    {Object.keys(errores).length != 0 && mostrarErrores &&
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <strong className="font-bold">ERROR:</strong>
+                            <span className="block"><ol>
+                                    {Object.keys(errores).map((e) =>(
+                                        <li key={e}>{errores[e]}</li>
+                                    ))}
+                                </ol></span>
+                            <span onClick={() => setMostrarErrores(false)} className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                                <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                            </span>
+                        </div>
+                    }
+                        <form ref={formRef} onSubmit={Validar}>
+                            <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                                <div>
+                                    <label className="text-black dark:text-gray-200" htmlFor="nombre">Nombre</label>
+                                    <input  name="nombre" type="text" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.nombre ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300  focus:border-orange-400 dark:focus:border-orange-400 focus:border-2 border-2  focus:outline-none  ring-orange-100 placeholder-red-500`}/>
+                                </div>
+
+                                <div>
+                                    <label className="text-black dark:text-gray-200" htmlFor="deporte">Deporte</label>
+                                    <select name="deporte" defaultValue="" className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-orange-500 dark:focus:border-orange-500 focus:outline-none focus:border-2 border-2 ring-orange-100 placeholder-red-500">
+                                        <option value=""></option>
+                                        {deportes.map(e =>(
+                                            <option key={e} value={e}>{e}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="sm:col-span-2">
+                                    <label className="text-black dark:text-gray-200" htmlFor="lugar">Lugar</label>
+                                    <input  name="lugar" onChange={(e) =>{setDireccion(e.target.value)}} type="text" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.lugar ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-500 dark:focus:border-orange-500 focus:outline-none focus:border-2 border-2 ring-orange-100 placeholder-red-500`}/>
+                                    <button></button>
+                                    <MapComponent direccion={direccion}/>
+                                </div>
+
+                                <div className="sm:col-span-2">
+                                    <label className="text-black dark:text-gray-200" htmlFor="fecha">Fecha</label>
+                                    <input  name="fecha" type="date" min={mañana.toISOString().split('T')[0]} max={fechaLimite.toISOString().split('T')[0]} className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.fecha ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-500 dark:focus:border-orange-500 focus:outline-none focus:border-2 border-2 ring-orange-100 placeholder-red-500`}/>
+                                </div>
+
+                                <div>
+                                    <label className="text-black dark:text-gray-200" htmlFor="horaInicio">Hora de Inicio</label>
+                                    <input  name="horaInicio" type="text" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.horaInicio ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-500 dark:focus:border-orange-500 focus:outline-none focus:border-2 border-2 ring-orange-100 placeholder-red-500`}/>
+                                </div>
+
+                                <div>
+                                    <label className="text-black dark:text-gray-200" htmlFor="horaFin">Hora de Finalización</label>
+                                    <input  name="horaFin" type="text" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.horaFin ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-400 dark:focus:border-orange-400 focus:border-2 border-2  focus:outline-none  ring-orange-100 placeholder-red-500`}/>
+                                </div>
+
+                                <div>
+                                    <label className="text-black dark:text-gray-200" htmlFor="minAsistentes">Minimo número de asistentes</label>
+                                    <input  name="minAsistentes" type="number" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.minAsistentes ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-500 dark:focus:border-orange-500 focus:outline-none focus:border-2 border-2 ring-orange-100 placeholder-red-500`}/>
+                                </div>
+
+                                <div>
+                                    <label className="text-black dark:text-gray-200" htmlFor="maxAsistentes">Máximo número de asistentes</label>
+                                    <input  name="maxAsistentes" type="number" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.maxAsistentes ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-400 dark:focus:border-orange-400 focus:border-2 border-2  focus:outline-none  ring-orange-100 placeholder-red-500`}/>
+                                </div>
+
+                                
+
+                                <div className="sm:col-span-2">
+                                    <label className="text-black dark:text-gray-200" htmlFor="visibilidad">Visibilidad</label>
+                                    <select onChange={handleChange} name="visibilidad" defaultValue="Publico" className="block w-full px-4 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 focus:border-orange-500 dark:focus:border-orange-500 focus:outline-none focus:border-2 border-2 ring-orange-100 placeholder-red-500">
+                                        <option value="Publico">Público</option>
+                                        <option value="Seguidores">Seguidores</option>
+                                        <option value="Equipo">Equipo</option>
+                                    </select>
+                                </div>
+                                {mostrarEquipos && 
+                                    <div className="sm:col-span-2 flex items-center">
+                                        
+                                        {Equipos.map((equipo) =>(
+                                            <div className="inline-flex items-center" key={equipo._id}>
+                                                <label className="relative flex cursor-pointer items-center rounded-full p-3" htmlFor={equipo._id} data-ripple-dark="true">
+                                                <input id={equipo._id} name="equipo" value={equipo._id} type="checkbox" className="peer relative h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 shadow hover:shadow-md transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-slate-400 before:opacity-0 before:transition-opacity checked:border-orange-400 checked:bg-orange-400 checked:before:bg-orange-400 hover:before:opacity-10"/>
+                                                <span className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" stroke-width="1">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </span>
+                                                </label>
+                                                <label className="cursor-pointer text-gray-800 dark:text-gray-200 text-sm" htmlFor={equipo._id} >
+                                                    {equipo.nombre}
+                                                </label>
+                                            </div>
+                                        ))}
+                                        
+                                        
+                                    </div>
+                                }
+
+                            </div>
+
+                            <div className="flex justify-center mt-6">
+                                <button className="px-10 py-3 leading-5 text-white transition-colors duration-200 transform bg-orange-500 rounded-md hover:bg-orange-400 focus:outline-none focus:bg-orange-800">Crear</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    )
+
+}

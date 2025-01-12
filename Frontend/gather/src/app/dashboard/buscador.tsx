@@ -1,68 +1,23 @@
 import { useCallback, useEffect, useState } from "react"
-import { fetchUsuarioById, fetchUsuariosByUsername, seguir, updateUsuario } from "../lib/usuarios"
+import { fetchUsuarioById, fetchUsuariosByUsername, seguir, updateUsuario, verificarId } from "../lib/usuarios"
 import Link from "next/link"
+import { buscarUsuarioId, dejarSeguirUsuario, seguirUsuario, verificar } from "../funciones"
 
 
 
 export default function Buscador(){
-    const [usuarioLoggeado,setUsuarioLoggueado] = useState({})
+    const [usuarioLogueado,setUsuarioLogueado] = useState({})
     const [usuariosEncontrados,setUsuariosEncontrados] = useState([])
 
-
-    const buscarUsuario = async () =>{
-        const usuario = sessionStorage.getItem("usuario")
-        if (usuario) {
-            try {
-                const response = await fetchUsuarioById(usuario)
-                setUsuarioLoggueado(response)
-            } catch (error) {
-                console.log(error.message)
-            }
-        }
-    }
-
     const buscarUsuarios = async (buscador) =>{
-        const dato = {
-            username: buscador
-        }
         try {
-            const response = await fetchUsuariosByUsername(dato)
+            const response = await fetchUsuariosByUsername(buscador)
             setUsuariosEncontrados(response)
         } catch (error) {
             console.log(error.message)
         }
         
     }
-
-    const dejarSeguirUsuario = async (seguido) =>{
-        const seguidor = sessionStorage.getItem("usuario")
-        const datos = {
-            seguido: seguido,
-            seguidor: seguidor,
-            dejarSeguir: true
-        }
-        try {
-            const response = await seguir(datos)
-           
-        } catch (error) {
-            console.log(error.message)
-        }
-    } 
-    
-    const seguirUsuario = async (seguido) =>{
-        const seguidor = sessionStorage.getItem("usuario")
-        const datos = {
-            seguido: seguido,
-            seguidor: seguidor,
-            dejarSeguir: false
-        }
-        try {
-            const response = await seguir(datos)
-           
-        } catch (error) {
-            console.log(error.message)
-        }
-    } 
 
     const handleChange = (event) =>{
         const dato = event.target.value
@@ -76,22 +31,30 @@ export default function Buscador(){
 
 
     useEffect(()=>{
-         buscarUsuario()
+        const token = sessionStorage.getItem("token");
+            if (token) {
+                verificar(token).then(dato =>{
+                    buscarUsuarioId(dato.usuario.id).then(dato =>{
+                        setUsuarioLogueado(dato)
+                    })
+                })
+            }
+         
          
     },[])
 
     return (
         
     <div className="p-8">
-        <Link href={`/dashboard/${usuarioLoggeado.username}`}>
-            <div className=" flex items-center gap-4">
-                <img src="../images/gatherLogo.png" alt="avatar" className="inline-block relative object-cover object-center !rounded-full w-12 h-12" />
+        <Link href={`/dashboard/user/${usuarioLogueado.username}`}>
+            <div className=" flex items-center text-left gap-4">
+                <img src={usuarioLogueado.foto || "/images/users.webp"} alt="avatar" className="border border-orange-400 inline-block relative object-cover object-center !rounded-full w-12 h-12" />
                 <div className="justify-start">
-                <h6 className="text-slate-800 dark:text-gray-300 font-semibold">
-                    {usuarioLoggeado.username}
+                <h6 className="text-slate-800 dark:text-gray-300 font-semibold hover:text-orange-400">
+                    {usuarioLogueado.username}
                 </h6>
                 <p className="text-slate-600 text-sm dark:text-gray-500">
-                    {usuarioLoggeado.nombre} {usuarioLoggeado.apellido}
+                    {usuarioLogueado.nombre} {usuarioLogueado.apellido} 
                 </p>
                 </div>
                 
@@ -112,20 +75,20 @@ export default function Buscador(){
             
             {usuariosEncontrados.map((usuario) => (
                
-                    <div key={usuario._id} className="p-3 flex items-center justify-between border-t cursor-pointer hover:bg-orange-400 hover:text-black">
-                         <Link  href={`/dashboard/${usuario.username}`}>
+                    <div key={usuario._id} className="p-3 flex items-center justify-between border-t cursor-pointer hover:bg-gray-700 hover:text-black">
+                         <Link  href={`/dashboard/user/${usuario.username}`} className="w-full">
                          <div className="flex items-center">
-                            <img className="rounded-full h-10 w-10" src="https://loremflickr.com/g/600/600/girl"/>
+                            <img className={`rounded-full h-10 w-10 border border-orange-400`} src={usuario.foto || "/images/users.webp"}/>
                             <div className="ml-2 flex flex-col">
                                 <div className="text-slate-800 dark:text-gray-300 font-semibold"> {usuario.username}</div>
                                 <div className="text-slate-600 text-sm dark:text-gray-500">{usuario.nombre} {usuario.apellido}</div>
                             </div>
                         </div> 
                         </Link>
-                        {usuarioLoggeado.seguidos?.includes(usuario._id) ? (
-                            <button type="submit" className="h-8 px-3 text-md font-bold text-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{dejarSeguirUsuario(usuario._id);window.location.reload()}}>Siguiendo</button>
+                        {usuarioLogueado.seguidos?.includes(usuario._id) ? (
+                            <button type="submit" className="h-8 px-3 text-md font-bold text-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{dejarSeguirUsuario(usuario._id,usuarioLogueado._id);window.location.reload()}}>Siguiendo</button>
                         ) : (
-                            <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{seguirUsuario(usuario._id);window.location.reload()}}>Seguir</button>
+                            <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{seguirUsuario(usuario._id,usuarioLogueado._id);window.location.reload()}}>Seguir</button>
                         )}
                         
                     </div>
