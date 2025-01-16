@@ -42,14 +42,16 @@ router.post('/postQuedada', async (req, res) => {
 router.get('/quedadasUsuarios', async (req, res) => {
         try {
             const quedadas = await Quedada.find();
+            const listaFiltrada = quedadas.filter((quedada) => quedada.equipo.length == 0 || !quedada.equipo)
             const quedadasConUsuarios = await Promise.all(
-                quedadas.map(async (quedada) =>{
-                    const user = await Usuario.findById(quedada.usuario).select('_id username')
+                listaFiltrada.map(async (quedada) =>{
+                    const user = await Usuario.findById(quedada.usuario).select('_id username foto')
                     const estado = conseguirEstado(quedada.fecha,quedada.horaInicio,quedada.horaFin)
                     return {...quedada.toObject(), user, estado }
                 
                 })
             )
+            
             
             res.status(200).json(quedadasConUsuarios);
         } catch (error) {
@@ -60,8 +62,9 @@ router.get('/quedadasUsuarios', async (req, res) => {
 router.get('/quedadas', async (req, res) => {
     try {
         const quedadas = await Quedada.find();
+        const listaFiltrada = quedadas.filter((quedada) => quedada.equipo.length == 0 || !quedada.equipo)
         const quedadasConEstado = await Promise.all(
-            quedadas.map((quedada) =>{
+            listaFiltrada.map((quedada) =>{
                 const estado = conseguirEstado(quedada.fecha,quedada.horaInicio,quedada.horaFin)
                 return {...quedada.toObject(), estado }
             
@@ -87,7 +90,7 @@ router.get('/quedadaId/:id', async (req, res) => {
 router.post('/quedada/', async (req, res) => {
     try { 
         const quedada = await Quedada.findById(req.body.id); 
-        const user = await Usuario.findById(quedada.usuario).select('_id username')
+        const user = await Usuario.findById(quedada.usuario).select('_id username foto')
         const estado = conseguirEstado(quedada.fecha,quedada.horaInicio,quedada.horaFin)
         const quedadaEstado = {...quedada.toObject(),user, estado}
         res.status(200).json(quedadaEstado); 
@@ -96,12 +99,11 @@ router.post('/quedada/', async (req, res) => {
     }
 })
 
-router.post('/buscarQuedadasPorEquipo/', async (req, res) => {
+router.post('/buscarQuedadasPorEquipo', async (req, res) => {
     try { 
-        
         const quedadas = await Quedada.find({equipo:req.body.equipo}); 
-        if (quedadas.length === 0) {
-            return res.status(400).json({message: error.message})
+        if (!quedadas) {
+            return res.status(400).json({message: "No hay quedadas"})
         }
 
         const quedadasConInfo = await Promise.all(
@@ -114,7 +116,7 @@ router.post('/buscarQuedadasPorEquipo/', async (req, res) => {
             )
         res.status(200).json(quedadasConInfo); 
     } catch (error) { 
-        res.status(400).json({ message: error.message }); 
+        res.status(400).json({ message: "ERROR" }); 
     }
 })
 
@@ -122,8 +124,9 @@ router.post('/buscarQuedadas', async (req,res) => {
     const nombre = req.body.nombre
     try {
         const quedadas = await Quedada.find({ nombre: { $regex: `^${nombre}`, $options: 'i' } })
+        const listaFiltrada = quedadas.filter((quedada) => quedada.equipo.length == 0 || !quedada.equipo)
         const quedadasConEstado = await Promise.all(
-            quedadas.map((quedada) =>{
+            listaFiltrada.map((quedada) =>{
                 const estado = conseguirEstado(quedada.fecha,quedada.horaInicio,quedada.horaFin)
                 return {...quedada.toObject(), estado }
             
@@ -171,8 +174,10 @@ router.post('/apuntarse',async (req,res) => {
             
 
             await usuarioExiste.save()
-            await quedadaExiste.save()
-
+            const quedada = await quedadaExiste.save()
+            const estado = conseguirEstado(quedada.fecha,quedada.horaInicio,quedada.horaFin)
+            const quedadaEstado = {...quedada.toObject(), estado}
+            res.status(200).json(quedadaEstado)
         
     } catch (error) {
         res.status(400).json({message: error.message})
@@ -185,8 +190,10 @@ router.post('/apuntarse',async (req,res) => {
 //Update by ID Method
 router.patch('/putQuedadas/:id', async (req, res) => {
     try { 
-        const quedadaActualizado = await Quedada.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.status(200).json(quedadaActualizado); 
+        const quedada = await Quedada.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const estado = conseguirEstado(quedada.fecha,quedada.horaInicio,quedada.horaFin)
+        const quedadaEstado = {...quedada.toObject(), estado}
+        res.status(200).json(quedadaEstado); 
     } catch (error) { 
         res.status(400).json({ message: error.message }); 
     }

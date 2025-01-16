@@ -15,8 +15,9 @@ export default function CrearEquipo({onClose}){
 
     const crear = async (equipo) =>{
         try {
-            const response = await Promise.all([createEquipo(equipo)])
+            const response = await createEquipo(equipo)
             console.log(response)
+            onClose(response)
         } catch (error) {
             console.log(error.message)
         }
@@ -36,7 +37,7 @@ export default function CrearEquipo({onClose}){
         let error = false
         let erroresTemp = {}
 
-        if(datos.nombre.match(/^[A-Za-z\d@$!%*#?&-_\s]+$/) == null || datos.nombre == ""){
+        if(datos.nombre.match(/^[A-Za-z\d@$!%*#?&-+\s]+$/) == null || datos.nombre == ""){
             error = true
             form.nombre.placeholder = `Campo NOMBRE vacio`
             erroresTemp.nombre = "Campo NOMBRE no correcto o vacio"
@@ -71,10 +72,10 @@ export default function CrearEquipo({onClose}){
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                <div className="overflow-auto rounded-lg shadow-lg p-6 w-1/3 dark:bg-gray-800 bg-gray-100 h-5/6 w-3/6 text-gray-800 dark:text-gray-300">
+                <div className="overflow-auto rounded-lg shadow-lg p-6 w-1/3 dark:bg-gray-800 bg-gray-100 h-5/6 lg:w-3/6 w-5/6 text-gray-800 dark:text-gray-300">
                     <div className="mb-5 flex flex-row items-center w-full justify-between">
                         <div className="mb-2 flex flex-row items-center">
-                            <h1 className="text-xl font-bold text-black capitalize dark:text-gray-200">Crear Gather</h1>
+                            <h1 className="text-xl font-bold text-black capitalize dark:text-gray-200">Crear Equipo</h1>
                         </div>
                         <div className="mb-2 flex flex-row items-center">
                             <button className="rounded " onClick={onClose}>
@@ -114,7 +115,7 @@ export default function CrearEquipo({onClose}){
                             
 
                             <div className="flex justify-center mt-6">
-                                <button className="px-10 py-3 leading-5 text-white transition-colors duration-200 transform bg-orange-500 rounded-md hover:bg-orange-400 focus:outline-none focus:bg-orange-800">Crear Equipo</button>
+                                <button className="text-black px-10 py-3 font-bold leading-5 transition-colors duration-200 transform bg-orange-500 rounded-md hover:bg-orange-400 focus:outline-none focus:bg-orange-800">Crear Equipo</button>
                             </div>
                         </form>
                     </div>

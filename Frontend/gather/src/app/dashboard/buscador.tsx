@@ -8,6 +8,7 @@ import { buscarUsuarioId, dejarSeguirUsuario, seguirUsuario, verificar } from ".
 export default function Buscador(){
     const [usuarioLogueado,setUsuarioLogueado] = useState({})
     const [usuariosEncontrados,setUsuariosEncontrados] = useState([])
+    const [buscador,setBuscador] = useState('')
 
     const buscarUsuarios = async (buscador) =>{
         try {
@@ -21,12 +22,22 @@ export default function Buscador(){
 
     const handleChange = (event) =>{
         const dato = event.target.value
+        setBuscador(dato)
         if (dato != "") {
             buscarUsuarios(dato)
         }else{
             setUsuariosEncontrados([])
         }
         
+    }
+
+    const handleClick = (usuario,dejar) =>{
+        if (dejar) {
+            dejarSeguirUsuario(usuario,usuarioLogueado._id).then(usuario => setUsuarioLogueado(usuario.seguidor))
+        } else {
+            seguirUsuario(usuario,usuarioLogueado._id).then(usuario => setUsuarioLogueado(usuario.seguidor))
+        }
+        buscarUsuarios(buscador)
     }
 
 
@@ -45,7 +56,7 @@ export default function Buscador(){
 
     return (
         
-    <div className="p-8">
+    <div className="xl:p-8 fixed w-2/6">
         <Link href={`/dashboard/user/${usuarioLogueado.username}`}>
             <div className=" flex items-center text-left gap-4">
                 <img src={usuarioLogueado.foto || "/images/users.webp"} alt="avatar" className="border border-orange-400 inline-block relative object-cover object-center !rounded-full w-12 h-12" />
@@ -75,7 +86,7 @@ export default function Buscador(){
             
             {usuariosEncontrados.map((usuario) => (
                
-                    <div key={usuario._id} className="p-3 flex items-center justify-between border-t cursor-pointer hover:bg-gray-700 hover:text-black">
+                    <div key={usuario._id} className="p-3 flex items-center justify-between border-t cursor-pointer hover:dark:bg-gray-700 hover:bg-gray-300 hover:text-black">
                          <Link  href={`/dashboard/user/${usuario.username}`} className="w-full">
                          <div className="flex items-center">
                             <img className={`rounded-full h-10 w-10 border border-orange-400`} src={usuario.foto || "/images/users.webp"}/>
@@ -86,9 +97,9 @@ export default function Buscador(){
                         </div> 
                         </Link>
                         {usuarioLogueado.seguidos?.includes(usuario._id) ? (
-                            <button type="submit" className="h-8 px-3 text-md font-bold text-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{dejarSeguirUsuario(usuario._id,usuarioLogueado._id);window.location.reload()}}>Siguiendo</button>
+                            <button type="submit" className="h-8 px-3 text-md font-bold text-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{handleClick(usuario._id,true)}}>Siguiendo</button>
                         ) : (
-                            <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{seguirUsuario(usuario._id,usuarioLogueado._id);window.location.reload()}}>Seguir</button>
+                            <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{handleClick(usuario._id,false)}}>Seguir</button>
                         )}
                         
                     </div>

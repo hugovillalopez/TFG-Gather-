@@ -67,6 +67,12 @@ const Usuario = new mongoose.Schema({
     solicitudes: {
         type: [String]
     },
+    resetToken: {
+        type:String
+    },
+    resetTokenExpire: {
+        type: Date
+    }
 
 })
 

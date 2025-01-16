@@ -173,3 +173,16 @@ export const deleteEquipo = async (idEquipo,idUsuario) => {
   const data = await response.json();
   return data;
 };
+
+export const actualizarFotoEquipo = async (datos) => {
+  const response = await fetch(`${API_URL}/gather/actualizarFotoEquipo`, {
+    method: 'POST',
+    body: datos,
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message);
+  }
+  const data = await response.json();
+  return data;
+};

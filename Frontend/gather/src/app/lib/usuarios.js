@@ -83,7 +83,7 @@ export const loggear = async (usuario) => {
   });
   if (!response.ok) {
     const errorDetails = await response.json();
-    throw new Error(`Network response was not ok: ${errorDetails.message || response.statusText}`);
+    throw new Error(`${errorDetails.message || response.statusText}`);
   }
   const data = await response.json();
   return data;
@@ -146,6 +146,74 @@ export const deleteUsuario = async (id) => {
   });
   if (!response.ok) {
     throw new Error('Network response was not ok');
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const actualizarFotoUsuario = async (datos) => {
+  const response = await fetch(`${API_URL}/gather/actualizarFotoUsuario`, {
+    method: 'POST',
+    body: datos,
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message);
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const olvidadaPassword = async (correo) => {
+  const datos = {
+    correo: correo
+}
+  const response = await fetch(`${API_URL}/gather/olvidadaPassword`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(datos),
+  });
+  if (!response.ok) {
+    const errorDetails = await response.json();
+    throw new Error(`Network response was not ok: ${errorDetails.message || response.statusText}`);
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const olvidadaPasswordToken = async (token,password) => {
+  const datos = {
+    password: password
+}
+  const response = await fetch(`${API_URL}/gather/olvidadaPassword/${token}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(datos),
+  });
+  if (!response.ok) {
+    const errorDetails = await response.json();
+    throw new Error(`Network response was not ok: ${errorDetails.message || response.statusText}`);
+  }
+  const data = await response.json();
+  return data;
+};
+
+export const cambiarPassword = async (datos) => {
+  
+  const response = await fetch(`${API_URL}/gather/cambiarPassword`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(datos),
+  });
+  if (!response.ok) {
+    const errorDetails = await response.json();
+    throw new Error(errorDetails.message || response.statusText)
   }
   const data = await response.json();
   return data;

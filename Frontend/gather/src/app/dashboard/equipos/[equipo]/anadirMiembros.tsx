@@ -37,6 +37,7 @@ export default function AniadirMiembro({onClose}){
     const gestionarMiembro = async (idUsuario,desapuntarse) =>{
         try {
             const response = await apuntarseEquipo(idUsuario,Equipo._id,desapuntarse) 
+            setEquipo(response)
         } catch (error) {
             console.log(error.message)
         }
@@ -52,6 +53,9 @@ export default function AniadirMiembro({onClose}){
         
     }
 
+    const handleClick = () =>{
+        onClose(Equipo)
+    }
 
     useEffect(()=>{
         const token = sessionStorage.getItem("token");
@@ -74,13 +78,13 @@ export default function AniadirMiembro({onClose}){
     return (
         
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                <div className="overflow-auto rounded-lg shadow-lg p-6 w-1/3 dark:bg-gray-800 bg-gray-100 h-5/6 w-3/6 text-gray-800 dark:text-gray-300">
+                <div className="overflow-auto rounded-lg shadow-lg p-6 w-1/3 dark:bg-gray-800 bg-gray-100 h-5/6 lg:w-3/6 w-5/6 text-gray-800 dark:text-gray-300">
                     <div className="mb-5 flex flex-row items-center w-full justify-between">
                         <div className="mb-2 flex flex-row items-center">
-                            <h1 className="text-xl font-bold text-black capitalize dark:text-gray-200">Crear Gather</h1>
+                            <h1 className="text-xl font-bold text-black capitalize dark:text-gray-200">Añadir Miembros</h1>
                         </div>
                         <div className="mb-2 flex flex-row items-center">
-                            <button className="rounded " onClick={onClose}>
+                            <button className="rounded " onClick={handleClick}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                                 </svg>
@@ -97,7 +101,7 @@ export default function AniadirMiembro({onClose}){
                         </div>
                         {usuariosEncontrados.map((usuario) => (
                             Equipo.miembros.includes(usuario._id) ? "" : (
-                                <div key={usuario._id} className="p-3 flex items-center justify-between border-t cursor-pointer hover:bg-orange-400 hover:text-black">
+                                <div key={usuario._id} className="p-3 lg:flex items-center justify-between border-t cursor-pointer hover:bg-orange-400 hover:text-black">
                                     <Link  href={`/dashboard/user/${usuario.username}`}>
                                     <div className="flex items-center">
                                     <img className={`rounded-full h-10 w-10 border border-orange-400`} src={usuario.foto || "/images/users.webp"}/>
@@ -108,7 +112,7 @@ export default function AniadirMiembro({onClose}){
                                 </div> 
                                 </Link>
                                 
-                                <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{gestionarMiembro(usuario._id,false)}}>Añadir Miembro</button>
+                                <button type="submit" className="mt-2 lg:mt-0 w-full h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{gestionarMiembro(usuario._id,false)}}>Añadir Miembro</button>
                             </div>
                             ) 
                             

@@ -1,6 +1,6 @@
 "use client";
-import { buscarUsuario, buscarUsuarioId, verificar } from "@/app/funciones";
-import { fetchUsuarioById, fetchUsuarioByUsername, seguir, updateUsuario } from "@/app/lib/usuarios"
+import { buscarUsuario, buscarUsuarioId, convertirAFormData, verificar } from "@/app/funciones";
+import { actualizarFotoUsuario, cambiarPassword, fetchUsuarioById, fetchUsuarioByUsername, seguir, updateUsuario } from "@/app/lib/usuarios"
 import { MantineProvider, Tabs } from "@mantine/core"
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation"
@@ -14,11 +14,13 @@ export default function EditarPerfil({onClose}){
     const {username} = params
     const router = useRouter()
     const formRef = useRef(null)
+    const formRefImg = useRef(null)
     const formPassword = useRef(null)
     const [errores,setErrores] = useState({})
     const [password,setPassword] = useState(false)
     const [editar,setEditar] = useState(false)
     const [foto,setFoto] = useState(false)
+    const [Img,setImg] = useState('No hay imagen seleccionada')
     const [mostrarErrores,setMostrarErrores] = useState(false)
     const hoy = new Date(); 
     const hace15Anios = new Date(hoy.getFullYear() - 15, hoy.getMonth(), hoy.getDate()); 
@@ -26,10 +28,10 @@ export default function EditarPerfil({onClose}){
 
     const data = async (usuario) =>{
             try{
-                const registro = await Promise.all([updateUsuario(usuario1._id,usuario)])
+                const registro = await Promise.all([updateUsuario(usuarioLogueado._id,usuario)])
     
                 if (registro) {
-                    console.log(registro)
+                    onClose(registro[0])
                 }
             }catch(error){
                 console.log(error.mensage)
@@ -124,8 +126,102 @@ export default function EditarPerfil({onClose}){
 
     }
 
-    const CambiarPassword = () =>{
+    const cambioContraseña = async (datos) =>{
+        try {
+            const response = await cambiarPassword(datos)
+            setUsuarioLogueado(response)
+            alert("Contraseña Cambiada")
+            setPassword(false)
+        } catch (error) {
+            alert(error)
+        }
+    }
 
+    const CambiarPassword = (e) =>{
+        e.preventDefault()
+        e.target.blur()
+
+        const form = formPassword.current
+        const datos = {
+            password: form.password.value,
+            newPassword: form.newPassword.value,
+            confirmNewPassword: form.confirmNewPassword.value
+        }
+
+        let error = false
+        let erroresTemp = {}
+
+        Object.keys(datos).forEach((e) =>{
+            switch (e) {
+                case 'password':
+                    if(datos[e].match(/^[A-Za-z\d@$!%*#?&]+$/) == null || datos[e] == ""){
+                        error = true
+                        form[e].placeholder = `Campo CONTRASEÑA ACTUAL no correcto o vacio`
+                        
+                    }
+                    
+                    break;
+                case 'newPassword':
+                    if(datos[e].match(/^[A-Za-z\d@$!%*#?&]+$/) == null || datos[e] == ""){
+                        error = true
+                        form[e].placeholder = `Campo CoNTRASEÑA NUEVA no correcto o vacio`
+                        
+                    }
+                        
+                        break;
+                case 'confirmNewPassword':
+                    if(datos[e].match(/^[A-Za-z\d@$!%*#?&]+$/) == null || datos[e] == ""){
+                        error = true
+                        form[e].placeholder = `Campo CONFIRMACION no correcto o vacio`
+                        
+                    }
+                    
+                    break;
+                default:
+                    break;
+            }
+        })
+
+        if (!error) {
+            if (datos.password != datos.newPassword) {
+                if (datos.confirmNewPassword == datos.newPassword) {
+                    cambioContraseña(datos)
+                } else {
+                    alert("La contraseña nueva y la confirmacion no coinciden")
+                }
+            } else {
+                alert("La contraseña actual no puede ser la nueva")
+            }
+            
+        }
+    }
+
+    const actualizarFoto = async (datos) =>{
+        try {
+            const response = await actualizarFotoUsuario(datos)
+            onClose(response)
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    const ValidarImg = (e) =>{
+        e.preventDefault()
+        e.target.blur()
+
+        const form = formRefImg.current
+
+        if (form.foto.files[0]) {
+            const datos = {
+                idUsuario: usuarioLogueado._id,
+                foto: form.foto.files[0]
+            }
+            const formData = convertirAFormData(datos)
+            actualizarFoto(formData)
+        } else {
+            alert("Error no hay imagen")
+        }
+            
     }
 
     useEffect(() => {
@@ -159,8 +255,8 @@ export default function EditarPerfil({onClose}){
     return (
         
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                <div className=" rounded-lg shadow-lg p-6 w-1/3 dark:bg-gray-800 bg-gray-100 h-4/5 w-3/6 text-gray-800 dark:text-gray-300">
-                    <div className="mb-5 flex flex-row items-center w-full justify-between">
+                <div className="overflow-auto rounded-lg shadow-lg lg:p-6 p-2 w-1/3 dark:bg-gray-800 bg-gray-100 lg:h-3/5 h-5/6 lg:w-3/6 w-5/6 text-gray-800 dark:text-gray-300">
+                    <div className="mb-5 flex lg:flex-row items-center w-full justify-between">
                         {!password && !editar && !foto && 
                             <div></div>
                         }
@@ -206,7 +302,7 @@ export default function EditarPerfil({onClose}){
                     <div>
                         {!password && !editar && !foto &&
                             <div>
-                                <button className="justify-between pr-2 flex items-center w-full text-left pl-3 py-4 shadow-lg bg-gray-300 dark:bg-[#252f41] rounded mb-2 " onClick={() => setEditar(true)}>
+                                <button className="justify-between pr-2 flex items-center w-full text-left pl-3 py-4 shadow-lg bg-gray-300 dark:bg-[#232f41] rounded mb-2 " onClick={() => setEditar(true)}>
                                     Editar Datos
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
@@ -229,9 +325,9 @@ export default function EditarPerfil({onClose}){
                         }
                         {editar &&
                          
-                            <div>
+                            <div >
                                 <form ref={formRef} onSubmit={Validar}>
-                                    <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+                                    <div className="grid grid-cols-1 gap-6 lg:mt-4 sm:grid-cols-2">
                                         <div>
                                             <label className="text-black dark:text-gray-200" htmlFor="nombre">Nombre</label>
                                             <input defaultValue={usuario1.nombre} name="nombre" type="text" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.nombre ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300  focus:border-orange-400 dark:focus:border-orange-400 focus:border-2 border-2  focus:outline-none  ring-orange-100 placeholder-red-500`}/>
@@ -242,8 +338,8 @@ export default function EditarPerfil({onClose}){
                                             <input defaultValue={usuario1.apellido} name="apellido" type="text" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.apellido ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-500 dark:focus:border-orange-500 focus:outline-none focus:border-2 border-2 ring-orange-100 placeholder-red-500`}/>
                                         </div>
                                         <div>
-                                            <label className="text-black dark:text-gray-200" htmlFor="fechaNacimiento">Fecha de Nacimiento</label>
-                                            <input defaultValue={usuario1.fechaNacimiento} name="fechaNacimiento" min={hace100Anios.toISOString().split('T')[0]} max={hace15Anios.toISOString().split('T')[0]}type="date" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.fechaNacimiento ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-400 dark:focus:border-orange-400 focus:border-2 border-2  focus:outline-none  ring-orange-100 placeholder-red-500`}/>
+                                            <label className="text-black dark:text-gray-200" htmlFor="fechaNacimiento">Fecha de Nacimiento: </label>
+                                            <input defaultValue={usuario1.fechaNacimiento.split('T')[0]} name="fechaNacimiento" min={hace100Anios.toISOString().split('T')[0]} max={hace15Anios.toISOString().split('T')[0]}type="date" className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white border ${errores.fechaNacimiento ? "border-red-300 dark:border-red-600" : "border-gray-300 dark:border-gray-600" } rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-400 dark:focus:border-orange-400 focus:border-2 border-2  focus:outline-none  ring-orange-100 placeholder-red-500`}/>
                                         </div>
 
                                         <div>
@@ -309,7 +405,23 @@ export default function EditarPerfil({onClose}){
                             
                         }
                         {foto && 
-                            <div>Hola</div>
+                            <div>
+                                <form ref={formRefImg} onSubmit={ValidarImg} encType="multipart/form-data">
+                                <div>
+                                    <label className="text-black dark:text-gray-200" >Introduce foto de equipo nueva</label>
+                                    <label className={`block w-full px-4 py-2 mt-2 text-gray-700 bg-white  rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-500 hover:border-orange-500 focus:outline-none focus:border-2 border-2 ring-orange-100 placeholder-red-500`} htmlFor="fotoEquipo">{Img}</label>
+                                    <input onChange={(e) =>{
+                                        const file = e.target.files ? e.target.files[0] : null;
+                                        setImg(file ? file.name : 'No hay imagen seleccionada')
+                                    }} name="foto" accept="image/*" id="fotoEquipo" type="file" className={`hidden block w-full px-4 py-2 mt-2 text-gray-700 bg-white rounded-md dark:bg-gray-800 dark:text-gray-300 focus:border-orange-500 dark:focus:border-orange-500 focus:outline-none focus:border-2 border-2 ring-orange-100 placeholder-red-500`}/>
+                                </div>
+                            
+
+                            <div className="flex justify-center mt-6">
+                                <button className="px-10 py-3 leading-5 text-white transition-colors duration-200 transform bg-orange-500 rounded-md hover:bg-orange-400 focus:outline-none focus:bg-orange-800">Actualizar Foto</button>
+                            </div>
+                        </form>
+                            </div>
                         }
 
                     </div>

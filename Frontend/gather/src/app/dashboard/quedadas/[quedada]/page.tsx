@@ -48,7 +48,6 @@ export default function verQuedada (){
     const eliminarQuedada = async (id) =>{
         try {
             const response = await deleteQuedada(id,usuarioLogueado._id)
-            alert("Quedada Eliminada")
             router.push("/dashboard")
         } catch (error) {
             console.log(error.message)
@@ -58,13 +57,20 @@ export default function verQuedada (){
     const botonApuntarse = async (desapuntarse) =>{
         try {
             const response = await apuntarse(usuarioLogueado._id,mostrarQuedada._id,desapuntarse)
-            
+            setMostrarQuedada(response)
+            conseguirAsistentes(response)
         } catch (error) {
             console.log(error.message)
         }
     }
 
-    
+    const handleEditar = async (quedada) =>{
+        setEditar(false)
+        if (quedada._id && quedada.nombre) {
+            setMostrarQuedada(quedada);
+        }
+        
+    }
 
     useEffect(() =>{
         if (quedada) {
@@ -93,15 +99,15 @@ export default function verQuedada (){
 
     return (
         <ProtectedRoute>
-            {editar && <EditarGather onClose={() => setEditar(false)}/>}
-            <div className="p-5 text-black dark:text-gray-200">
-                <div className="flex justify-between items-center mb-2">
+            {editar && <EditarGather onClose={handleEditar}/>}
+            <div className="overflow-y-auto h-full lg:p-5 text-black dark:text-gray-200">
+                <div className="lg:flex justify-between items-center mb-2">
                     <div>
-                        <b className="text-3xl border-r border-orange-400 pr-2">{mostrarQuedada.nombre}</b> <b className="text-xl ml-2">{mostrarQuedada.deporte}</b> 
-                        <p className="mt-2">Creada por <b className="ml-2 shadow-xl bg-[#34425b] p-2 rounded hover:bg-orange-400 cursor-alias">{usuarioQuedada.username}</b></p>
+                        <p className="justify-center flex items-center"><b className="text-3xl border-r border-orange-400 pr-2 ">{mostrarQuedada.nombre}</b> <b className="text-xl ml-2">{mostrarQuedada.deporte}</b></p> 
+                        <p className="justify-center flex items-center mt-2">Creada por <Link href={`/dashboard/user/${usuarioQuedada.username}`} className="ml-2 shadow-xl dark:bg-[#34425b] bg-gray-300 p-2 rounded hover:bg-orange-400 cursor-alias font-bold">{usuarioQuedada.username}</Link></p>
                     </div>
-                    <div>              
-                        <div className={`mr-4 rounded-3xl p-2 px-4 text-black ${mostrarQuedada.estado == "En curso" ? "bg-yellow-400" : (mostrarQuedada.estado == "Finalizada" ? "bg-red-400" : "bg-green-400")}`}>
+                    <div className="flex justify-center">              
+                        <div className={`w-auto justify-center lg:mr-4  lg:mt-0 rounded-3xl p-2 lg:px-4 text-black ${mostrarQuedada.estado == "En curso" ? "bg-yellow-400" : (mostrarQuedada.estado == "Finalizada" ? "bg-red-400" : "bg-green-400")}`}>
                             {mostrarQuedada.estado}
                         </div>                   
                     </div>
@@ -115,9 +121,9 @@ export default function verQuedada (){
                                     <td className="p-2">Hora de finalizacion</td>
                                 </tr>
                                 <tr>
-                                    <td className="p-2"><b className="ml-2 shadow-xl bg-[#34425b] p-2 rounded">{mostrarQuedada.fecha}</b></td>
-                                    <td className="p-2"><b className="ml-2 shadow-xl bg-[#34425b] p-2 rounded">{mostrarQuedada.horaInicio}</b></td>
-                                    <td className="p-2"><b className="ml-2 shadow-xl bg-[#34425b] p-2 rounded">{mostrarQuedada.horaFin}</b></td>
+                                    <td className="p-2"><b className="ml-2 shadow-xl dark:bg-[#34425b] bg-gray-300 p-2 rounded">{mostrarQuedada.fecha}</b></td>
+                                    <td className="p-2"><b className="ml-2 shadow-xl dark:bg-[#34425b] bg-gray-300 p-2 rounded">{mostrarQuedada.horaInicio}</b></td>
+                                    <td className="p-2"><b className="ml-2 shadow-xl dark:bg-[#34425b] bg-gray-300 p-2 rounded">{mostrarQuedada.horaFin}</b></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -131,16 +137,16 @@ export default function verQuedada (){
                                     <td className="p-2">Usuarios apuntados</td>
                                 </tr>
                                 <tr>
-                                    <td className="p-2"><b className="ml-2 shadow-xl bg-[#34425b] p-2 rounded">{mostrarQuedada.minAsistentes}</b></td>
-                                    <td className="p-2"><b className="ml-2 shadow-xl bg-[#34425b] p-2 rounded">{mostrarQuedada.maxAsistentes}</b></td>
-                                    <td className="p-2"><b className="ml-2 shadow-xl bg-[#34425b] p-2 rounded">{mostrarQuedada?.usuariosAsistentes?.length || 0}</b></td>
+                                    <td className="p-2"><b className="ml-2 shadow-xl dark:bg-[#34425b] bg-gray-300 p-2 rounded">{mostrarQuedada.minAsistentes}</b></td>
+                                    <td className="p-2"><b className="ml-2 shadow-xl dark:bg-[#34425b] bg-gray-300 p-2 rounded">{mostrarQuedada.maxAsistentes}</b></td>
+                                    <td className="p-2"><b className="ml-2 shadow-xl dark:bg-[#34425b] bg-gray-300 p-2 rounded">{mostrarQuedada?.usuariosAsistentes?.length || 0}</b></td>
                                 </tr>
                             </tbody>
                         </table>
                 </div>
                 <div className="items-center justify-center text-xl p-4 ">
                     <div className="items-center justify-center text-xl p-4 w-full">
-                        <div className="flex items-center justify-center"><h1 >Lugar:</h1><b className="ml-2 shadow-xl bg-[#34425b] p-2 rounded">{mostrarQuedada.lugar}</b></div>
+                        <div className="flex items-center justify-center"><h1 >Lugar:</h1><b className="ml-2 shadow-xl dark:bg-[#34425b] bg-gray-300 p-2 rounded">{mostrarQuedada.lugar}</b></div>
                         
                         <div className="p-2">
                             
@@ -150,12 +156,12 @@ export default function verQuedada (){
                     <div className="items-center justify-center text-xl p-4 w-full">
                         <div className="flex items-center justify-center"><h1 className="p-2">Apuntados</h1></div>
                         
-                        <div className="overflow-y-auto border p-2 max-h-44">{mostrarAsistentes.length === 0 ? ( <p>No hay seguidores</p> ) : (
+                        <div className="overflow-y-auto border border-orange-400 rounded p-2 max-h-44">{mostrarAsistentes.length === 0 ? ( <p>No hay seguidores</p> ) : (
                                  mostrarAsistentes.map(usuario => (
-                                    <div key={usuario._id} className="p-3 flex items-center justify-between border-t cursor-pointer hover:bg-gray-700 hover:text-black">
+                                    <div key={usuario._id} className="p-3 flex items-center justify-between border-t dark:border-white border-black cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                                         <Link  href={`/dashboard/user/${usuario.username}`}>
                                         <div className="flex items-center">
-                                            <img className="rounded-full h-10 w-10" src="https://loremflickr.com/g/600/600/girl"/>
+                                            <img className="rounded-full h-10 w-10" src={usuario.foto}/>
                                             <div className="ml-2 flex flex-col">
                                                 <div className="text-slate-800 dark:text-gray-300 font-semibold"> {usuario.username}</div>
                                                 <div className="text-slate-600 text-sm dark:text-gray-500">{usuario.nombre} {usuario.apellido}</div>
@@ -176,17 +182,17 @@ export default function verQuedada (){
                     </div>
 
                 </div>
-                <div className="flex items-center justify-between text-xl p-4">
+                <div className="sm:flex items-center justify-center lg:justify-between text-xl p-4">
                     {mostrarQuedada.estado == "Inscripción Abierta" ? (
                     mostrarQuedada.usuariosAsistentes?.includes(usuarioLogueado._id) ? (
-                        <button onClick={() => {botonApuntarse(true),window.location.reload()}} type="submit" className="flex items-center h-8 m-2 p-5 text-md font-bold text-gray-800 bg-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100">
+                        <button onClick={() => {botonApuntarse(true)}} type="submit" className="flex justify-center items-center h-8 m-2 p-5 text-md font-bold text-gray-800 bg-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 mr-1">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                             </svg>
                             Desapuntarse
                         </button>
                     ) : (
-                        <button onClick={() => {botonApuntarse(false),window.location.reload()}} type="submit" className="flex items-center h-8 m-2 p-5 text-md font-bold text-gray-800 bg-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100">
+                        <button onClick={() => {botonApuntarse(false)}} type="submit" className="flex items-center h-8 m-2 p-5 text-md font-bold text-gray-800 bg-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 mr-1">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                             </svg>

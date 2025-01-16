@@ -165,12 +165,13 @@ export default function CrearGather ({onClose}) {
                             } else {
                                 datos.equipos = equipos
                                 crear(datos)
-                                window.location.reload()
+                                
                             }
                         }
+                    } else {
+                        crear(datos)
                     }
-                    //crear(datos)
-                    //window.location.reload()
+                    
                     
                 }
             }
@@ -207,7 +208,7 @@ export default function CrearGather ({onClose}) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                <div className="overflow-auto rounded-lg shadow-lg p-6 w-1/3 dark:bg-gray-800 bg-gray-100 h-5/6 w-3/6 text-gray-800 dark:text-gray-300">
+                <div className="overflow-auto rounded-lg shadow-lg p-6 w-1/3 dark:bg-gray-800 bg-gray-100 h-5/6 lg:w-3/6 w-5/6 text-gray-800 dark:text-gray-300">
                     <div className="mb-5 flex flex-row items-center w-full justify-between">
                         <div className="mb-2 flex flex-row items-center">
                             <h1 className="text-xl font-bold text-black capitalize dark:text-gray-200">Crear Gather</h1>

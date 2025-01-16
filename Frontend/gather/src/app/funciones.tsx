@@ -42,7 +42,7 @@ export const buscarUsuario = async (usuario) =>{
 export const seguirUsuario = async (seguido,seguidor) =>{
     try {
         const response = await seguir(seguido,seguidor,false)
-        console.log(response) 
+        return response 
     } catch (error) {
         console.log(error.message)
     }
@@ -51,7 +51,7 @@ export const seguirUsuario = async (seguido,seguidor) =>{
 export const dejarSeguirUsuario = async (seguido,seguidor) =>{
     try {
         const response = await seguir(seguido,seguidor,true)
-        console.log(response) 
+        return response 
     } catch (error) {
         console.log(error.message)
     }
@@ -80,7 +80,8 @@ export const convertirAFormData = (datos) => {
 export const fetchUsuarios = async (userIds) => { 
     try { 
         const responses = await Promise.all(userIds.map(_id => fetchUsuarioById(_id))); 
-        return responses; 
+        return responses;
+       
     } catch (error) { 
         console.error('Error fetching usuarios:', error); 
     } 

@@ -172,8 +172,9 @@ router.post('/solicitarEquipo',async (req,res) => {
                 
             }
 
-            await usuarioExiste.save()
-            await equipoExiste.save()
+            const user = await usuarioExiste.save()
+            const equipo = await equipoExiste.save()
+            res.status(200).json({usuario: user,equipo: equipo})
             
         
     } catch (error) {
@@ -204,7 +205,6 @@ router.post('/apuntarseEquipo',async (req,res) => {
                 if (equipoExiste.miembros.length == 1) {
                     await Equipo.findByIdAndDelete(idEquipo);
                     usuarioExiste.equipos.splice(usuarioExiste.equipos.indexOf(idEquipo),1)
-                    
 
                 } else {
 
@@ -242,9 +242,9 @@ router.post('/apuntarseEquipo',async (req,res) => {
 
             await usuarioExiste.save()
             if (equipoExiste.miembros.length >= 1) {
-                await equipoExiste.save()
+                const equipo = await equipoExiste.save()
+                res.status(200).json(equipo)
             }
-        
     } catch (error) {
         res.status(400).json({message: error.message})
     }
@@ -282,7 +282,8 @@ router.post('/adminsEquipo',async (req,res) => {
             }
 
             await usuarioExiste.save()
-            await equipoExiste.save()
+            const equipo = await equipoExiste.save()
+            res.status(200).json(equipo)
             
         
     } catch (error) {
@@ -316,11 +317,22 @@ router.delete('/deleteEquipo/:idEquipo/:idUsuario', async (req, res) => {
     }
 })
 
-router.post('/upload', upload.single('file'), (req, res) => {
+router.post('/actualizarFotoEquipo', upload.single('foto'), async (req, res) => {
     try {
-      if (req.file) {
+        if (req.file) {
           // La URL pública del archivo subido a S3
-          const fileUrl = req.file.location;
+            const fileUrl = req.file.location;
+
+            const equipo = await Equipo.findById(req.body.idEquipo)
+          
+            if (!equipo) {
+                return res.status(400).json({message:"Usuario no encontrado"})
+            }
+                equipo.foto = fileUrl
+                equipo.nombre = req.body.nombre
+                const equipoToSave = await equipo.save()
+                res.status(200).json(equipoToSave)
+                
           
           res.status(200).json({
           message: 'Archivo subido exitosamente',

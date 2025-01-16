@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { convertirAFormData } from "../funciones";
 import { get } from "lodash";
+import Link from "next/link";
 
 
 export default function Registrarse() {
@@ -164,7 +165,7 @@ function Validar(e){
                     </span>
                 </div>
             }
-            <section className="max-w-4xl p-6 mx-auto bg-white-600 rounded-md shadow-md dark:bg-gray-800 mt-20 border border-orange-400 border-4">
+            <section className=" max-w-4xl p-6 mx-auto bg-white-600 rounded-md lg:shadow-md lg:dark:bg-gray-800 mt-20 lg:border lg:border-orange-400 lg:border-4">
                 <h1 className="text-xl font-bold text-black capitalize dark:text-gray-200">Registro de sesión</h1>
                 <form ref={formRef} onSubmit={Validar} encType="multipart/form-data">
                     <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
@@ -232,6 +233,9 @@ function Validar(e){
 
                     <div className="flex justify-center mt-6">
                         <button className="px-10 py-3 leading-5 text-white transition-colors duration-200 transform bg-orange-500 rounded-md hover:bg-orange-400 focus:outline-none focus:bg-orange-800">Registrar</button>
+                    </div>
+                    <div className="flex justify-center mt-6">
+                        <Link href={`/`} className="px-5 py-3 leading-5 text-white transition-colors duration-200 transform bg-orange-500 rounded-md hover:bg-orange-400 focus:outline-none focus:bg-orange-800">Volver</Link>
                     </div>
                 </form>
             </section>
