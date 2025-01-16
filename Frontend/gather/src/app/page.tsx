@@ -1,6 +1,6 @@
 "use client";
-import { Button, Card, Grid, MantineProvider, rem, TextInput } from "@mantine/core";
-import { FC, useRef, useState } from "react";
+
+import { useRef, useState } from "react";
 import '@mantine/core/styles.css'
 import './globals.css'
 import { loggear, verificarId } from "./lib/usuarios";
@@ -38,7 +38,7 @@ export default function Login(){
         }
 
         let error = false
-        let erroresTemp = {}
+        const erroresTemp = {}
 
         Object.keys(datos).forEach((e) =>{
             if (datos[e] == "") {

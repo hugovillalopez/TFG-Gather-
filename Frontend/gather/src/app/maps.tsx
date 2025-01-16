@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 
 const MapComponent = ({direccion}) => {
   const [location, setLocation] = useState({ lat: -34.397, lng: 150.644 });

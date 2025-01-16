@@ -1,10 +1,10 @@
 "use client";
 import { buscarUsuarioId, conseguirEquipos, verificar, } from "@/app/funciones";
-import { fetchEquipoById } from "@/app/lib/equipos";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import CrearEquipo from "./crearEquipo";
+import Image from "next/image";
 
 
 export default function Equipos(){
@@ -58,7 +58,7 @@ export default function Equipos(){
                     <div key={equipo.nombre} className="p-3 flex items-center justify-between border-t dark:border-white border-black cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                         <Link href={`/dashboard/equipos/${equipo.nombre.replace(/ /g, "_")}`}  className="w-full">
                         <div className="flex items-center">
-                            <img className={`rounded-full h-10 w-10 p-1 ${!equipo.foto ? "border" : ""}`} src={equipo.foto || "/images/users.webp"}/>
+                            <Image alt="foto" width="40" height="40" className={`rounded-full h-10 w-10 p-1 ${!equipo.foto ? "border" : ""}`} src={equipo.foto || "/images/users.webp"}/>
                             <div className="ml-2 flex flex-col">
                                 <div className="text-slate-800 dark:text-gray-300 font-semibold"> {equipo.nombre}</div>
                             </div>

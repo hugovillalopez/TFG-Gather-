@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react"
-import { fetchUsuarioById, fetchUsuariosByUsername, seguir, updateUsuario, verificarId } from "../lib/usuarios"
+import { useEffect, useState } from "react"
+import {fetchUsuariosByUsername,} from "../lib/usuarios"
 import Link from "next/link"
 import { buscarUsuarioId, dejarSeguirUsuario, seguirUsuario, verificar } from "../funciones"
+import Image from "next/image"
 
 
 
@@ -89,7 +90,7 @@ export default function Buscador(){
                     <div key={usuario._id} className="p-3 flex items-center justify-between border-t cursor-pointer hover:dark:bg-gray-700 hover:bg-gray-300 hover:text-black">
                          <Link  href={`/dashboard/user/${usuario.username}`} className="w-full">
                          <div className="flex items-center">
-                            <img className={`rounded-full h-10 w-10 border border-orange-400`} src={usuario.foto || "/images/users.webp"}/>
+                            <Image alt="fotoPerfil" width="40" height="40" className={`rounded-full h-10 w-10 border border-orange-400`} src={usuario.foto || "/images/users.webp"}/>
                             <div className="ml-2 flex flex-col">
                                 <div className="text-slate-800 dark:text-gray-300 font-semibold"> {usuario.username}</div>
                                 <div className="text-slate-600 text-sm dark:text-gray-500">{usuario.nombre} {usuario.apellido}</div>
@@ -97,9 +98,9 @@ export default function Buscador(){
                         </div> 
                         </Link>
                         {usuarioLogueado.seguidos?.includes(usuario._id) ? (
-                            <button type="submit" className="h-8 px-3 text-md font-bold text-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{handleClick(usuario._id,true)}}>Siguiendo</button>
+                            <button type="submit" className="h-8 px-3 text-md font-bold text-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={() =>{handleClick(usuario._id,true)}}>Siguiendo</button>
                         ) : (
-                            <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{handleClick(usuario._id,false)}}>Seguir</button>
+                            <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={() =>{handleClick(usuario._id,false)}}>Seguir</button>
                         )}
                         
                     </div>

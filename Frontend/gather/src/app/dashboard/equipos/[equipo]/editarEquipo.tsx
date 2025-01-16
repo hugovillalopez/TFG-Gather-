@@ -1,7 +1,7 @@
 "use client";
 
 import { buscarUsuarioId, convertirAFormData, verificar } from "@/app/funciones";
-import { actualizarFotoEquipo, createEquipo, fetchEquipoByNombre, updateEquipo } from "@/app/lib/equipos";
+import { actualizarFotoEquipo, fetchEquipoByNombre, updateEquipo } from "@/app/lib/equipos";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -57,7 +57,7 @@ export default function EditarEquipo({onClose}){
         }
 
         let error = false
-        let erroresTemp = {}
+        const erroresTemp = {}
 
         if(datos.nombre.match(/^[A-Za-z\d@$!%*#?&-_\s]+$/) == null || datos.nombre == ""){
             error = true

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { fetchUsuarioById, verificarId } from "../../../lib/usuarios";
-import { createQuedada, fetchQuedadaById, updateQuedada } from "../../../lib/quedadas";
+import { fetchQuedadaById, updateQuedada } from "../../../lib/quedadas";
 import { useParams, useRouter } from "next/navigation";
 import deportes from "../../deportes";
 import { buscarUsuarioId, verificar } from "@/app/funciones";
@@ -62,7 +61,7 @@ export default function EditarGather ({onClose}) {
         }
 
         let error = false
-        let erroresTemp = {}
+        const erroresTemp = {}
 
         Object.keys(datos).forEach((e) =>{
             

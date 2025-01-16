@@ -1,10 +1,9 @@
 "use client";
 import { createUsuarios } from "@/app/lib/usuarios";
-import { Card, MantineProvider } from "@mantine/core";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import { convertirAFormData } from "../funciones";
-import { get } from "lodash";
+
 import Link from "next/link";
 
 
@@ -44,7 +43,7 @@ function Validar(e){
 
         const form = formRef.current
 
-        let datos = {
+        const datos = {
             nombre : form.nombre.value,
             apellido : form.apellido.value,
             fechaNacimiento : form.fechaNacimiento.value,
@@ -57,7 +56,7 @@ function Validar(e){
 
            
         let error = false
-        let erroresTemp = {}
+        const erroresTemp = {}
 
         Object.keys(datos).forEach((e) =>{
             

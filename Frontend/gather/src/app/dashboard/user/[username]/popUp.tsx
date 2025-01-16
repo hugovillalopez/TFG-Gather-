@@ -1,12 +1,11 @@
 "use client";
 import { buscarUsuario, buscarUsuarioId, conseguirEquipos, dejarSeguirUsuario, fetchUsuarios, seguirUsuario, verificar } from "@/app/funciones";
 import { solicitarEquipo } from "@/app/lib/equipos";
-
-import { fetchUsuarioById, fetchUsuarioByUsername, seguir, verificarId } from "@/app/lib/usuarios"
 import { MantineProvider, Tabs } from "@mantine/core"
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import Image from "next/image";
 
 
 export default function PopUp({tab, onClose}){
@@ -178,7 +177,7 @@ export default function PopUp({tab, onClose}){
                                     <div key={usuario._id} className="p-3 text-sm sm:text-md flex items-center justify-between border-t dark:border-white border-black  cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                                         <Link  href={`/dashboard/user/${usuario.username}`}  className="w-full">
                                         <div className="flex items-center">
-                                            <img className="rounded-full sm:h-10 sm:w-10 h-6 w-6" src={usuario.foto || "/images/users.webp"}/>
+                                            <Image alt="fotoPerfil" width="40" height="40" className="rounded-full sm:h-10 sm:w-10 h-6 w-6" src={usuario.foto || "/images/users.webp"}/>
                                             <div className="ml-2 flex flex-col">
                                                 <div className="text-slate-800 dark:text-gray-300 font-semibold"> {usuario.username}</div>
                                                 <div className="text-slate-600 text-sm dark:text-gray-500">{usuario.nombre} {usuario.apellido}</div>
@@ -204,7 +203,7 @@ export default function PopUp({tab, onClose}){
                                     <div key={usuario._id} className="p-3 text-sm sm:text-md flex items-center justify-between border-t dark:border-white border-black cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                                         <Link  href={`/dashboard/user/${usuario.username}`}  className="w-full">
                                         <div className="flex items-center">
-                                            <img className="rounded-full sm:h-10 sm:w-10 h-6 w-6" src={usuario.foto || "/images/users.webp"}/>
+                                            <Image alt="fotoPerfil" width="40" height="40" className="rounded-full sm:h-10 sm:w-10 h-6 w-6" src={usuario.foto || "/images/users.webp"}/>
                                             <div className="ml-2 flex flex-col">
                                                 <div className="text-slate-800 dark:text-gray-300 font-semibold"> {usuario.username}</div>
                                                 <div className="text-slate-600 text-sm dark:text-gray-500">{usuario.nombre} {usuario.apellido}</div>
@@ -215,7 +214,7 @@ export default function PopUp({tab, onClose}){
                                             usuarioLogueado.seguidos?.includes(usuario._id) ? (
                                                 <button type="submit" className="h-8 px-3 text-sm sm:text-md font-bold text-orange-200 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={() =>dejar(usuario._id,true)}>Siguiendo</button>
                                             ) : (
-                                                <button type="submit" className="h-8 px-3 text-sm sm:text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{() =>seguir(usuario._id,true)}}>Seguir</button>
+                                                <button type="submit" className="h-8 px-3 text-sm sm:text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={() =>seguir(usuario._id,true)}>Seguir</button>
                                             )
                                         ) : ""}
                                     </div>
@@ -228,7 +227,7 @@ export default function PopUp({tab, onClose}){
                             <div key={equipo.nombre} className="p-3 flex items-center justify-between border-t dark:border-white border-black cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                                 <Link href={`/dashboard/equipos/${equipo.nombre.replace(/ /g, "_")}`}  className="w-full">
                                 <div className="flex items-center">
-                                    <img className={`rounded-full sm:h-10 sm:w-10 h-6 w-6 sm:p-1 ${!equipo.foto ? "border" : ""}`} src={equipo.foto || "/images/users.webp"}/>
+                                    <Image alt="fotoPerfil" width="40" height="40" className={`rounded-full sm:h-10 sm:w-10 h-6 w-6 sm:p-1 ${!equipo.foto ? "border" : ""}`} src={equipo.foto || "/images/users.webp"}/>
                                     <div className="ml-2 flex flex-col">
                                         <div className="text-slate-800 dark:text-gray-300 font-semibold"> {equipo.nombre}</div>
                                     </div>
@@ -236,9 +235,9 @@ export default function PopUp({tab, onClose}){
                                 </Link>
                                 <div>
                                     {usuarioLogueado.equipos.includes(equipo._id) ? "" : usuarioLogueado.solicitudes.includes(equipo._id)? (
-                                        <button type="submit" className="sm:w-36 w-28 text-sm sm:text-md text-green-400 border border-green-400 h-8 sm:px-3 font-bold bg-trasparent  rounded-xl hover:bg-green-100 " onClick={(e) =>{solicitarUnion(equipo._id,false)}}>Quitar Solicitud</button>    
+                                        <button type="submit" className="sm:w-36 w-28 text-sm sm:text-md text-green-400 border border-green-400 h-8 sm:px-3 font-bold bg-trasparent  rounded-xl hover:bg-green-100 " onClick={() =>{solicitarUnion(equipo._id,false)}}>Quitar Solicitud</button>    
                                     ) : (
-                                        <button type="submit" className="sm:w-36 w-28 text-sm sm:text-md text-black h-8 sm:px-3 font-bold bg-green-400  rounded-xl hover:bg-green-100 " onClick={(e) =>{solicitarUnion(equipo._id,true)}}>Solicitar Union</button>    
+                                        <button type="submit" className="sm:w-36 w-28 text-sm sm:text-md text-black h-8 sm:px-3 font-bold bg-green-400  rounded-xl hover:bg-green-100 " onClick={() =>{solicitarUnion(equipo._id,true)}}>Solicitar Union</button>    
                                     )}
                                 </div>
                                 

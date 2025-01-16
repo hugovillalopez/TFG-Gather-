@@ -1,19 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react"
-import { fetchUsuarioById, verificarId } from "../lib/usuarios";
+import {useEffect, useRef, useState } from "react"
 import { createQuedada } from "../lib/quedadas";
 import { useRouter } from "next/navigation";
 import deportes from "./deportes";
 import { buscarUsuarioId, conseguirEquipos, verificar } from "../funciones";
 import MapComponent from "../maps";
-import { debounce } from "lodash";
-import _ from "lodash";
 
 
 export default function CrearGather ({onClose}) {
     const [usuarioLogueado,setUsuarioLogueado] = useState({})
     const [errores,setErrores] = useState({})
     const [direccion,setDireccion] = useState('')
-    const listaDeportes = deportes.sort()
     const formRef = useRef(null)
     const router = useRouter()
     const [mostrarErrores,setMostrarErrores] = useState(false)
@@ -55,8 +51,8 @@ export default function CrearGather ({onClose}) {
         }
 
         let error = false
-        let erroresTemp = {}
-        let equipos = []
+        const erroresTemp = {}
+        const equipos = []
 
         Object.keys(datos).forEach((e) =>{
             
@@ -157,7 +153,6 @@ export default function CrearGather ({onClose}) {
                                     equipos.push(checkbox.value)
                                 }
                             });
-                            console.log(equipos)
                             if (equipos.length == 0) {
                                 erroresTemp['equipos'] = "No has seleccionado ningun EQUIPO"
                                 setErrores(erroresTemp)
@@ -197,7 +192,9 @@ export default function CrearGather ({onClose}) {
                     setUsuarioLogueado(dato)
                 })
             })
-        }
+            } else {
+                router.push("/")
+            }
         
     },[])
 

@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+
 import { fetchUsuarioById, fetchUsuarioByUsername, seguir, verificarId } from "./lib/usuarios";
 import { fetchEquipoById } from "./lib/equipos";
 

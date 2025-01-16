@@ -1,5 +1,5 @@
 "use client";
-import {fetchUsuarioById, fetchUsuarioByUsername, verificarId} from "@/app/lib/usuarios";
+
 import { useParams, useRouter} from "next/navigation";
 import { useEffect, useState } from "react"
 import { ProtectedRoute } from "../../protectedRoutes";
@@ -8,10 +8,11 @@ import EditarPerfil from "./editarPerfil";
 import { buscarUsuario, buscarUsuarioId, verificar } from "@/app/funciones";
 import Link from "next/link";
 import { fetchQuedadaById } from "@/app/lib/quedadas";
+import Image from "next/image";
 
 
 
-export default function perfilUsuario(){
+export default function PerfilUsuario(){
     const [usuarioLogueado,setUsuarioLogueado] = useState({})
     const [usuario,setUsuario] = useState({})
     const [tab,setTab] = useState("")
@@ -87,7 +88,7 @@ export default function perfilUsuario(){
 
         <div className="lg:flex flex-col md:flex-row pt-10 text-gray-800 dark:text-gray-300">
             <div className="md:w-1/3 text-center mb-8 md:mb-0">
-                <img src={usuarioLogueado.foto || "/images/users.webp"} alt="Profile Picture" className="rounded-full lg:w-40 lg:h-40 w-24 h-24 mx-auto mb-4 border-4 border-orange-400 transition-transform duration-300 hover:scale-105"/>
+                <Image alt="fotoPerfil" width="40" height="40" src={usuarioLogueado.foto || "/images/users.webp"} alt="Profile Picture" className="rounded-full lg:w-40 lg:h-40 w-24 h-24 mx-auto mb-4 border-4 border-orange-400 transition-transform duration-300 hover:scale-105"/>
             </div>
             
             <div className="md:w-2/3 ">
@@ -103,15 +104,15 @@ export default function perfilUsuario(){
                 
                     <div className="justify-start sm:justify-center sm:flex">
                         
-                                <div className="text-center" onClick={(e) =>{setTab("Seguidos");setMostrar(true)}}>
+                                <div className="text-center" onClick={() =>{setTab("Seguidos");setMostrar(true)}}>
                                     <p className="p-3 pb-0 text-lg">Seguidos</p>
                                     <p className="text-2xl">{usuario?.seguidos?.length || 0}</p>
                                 </div>
-                                <div className="text-center" onClick={(e) =>{setTab("Seguidores");setMostrar(true)}}>
+                                <div className="text-center" onClick={() =>{setTab("Seguidores");setMostrar(true)}}>
                                     <p className="p-3 pb-0 text-lg">Seguidores</p>
                                     <p className="text-2xl">{usuario?.seguidores?.length || 0}</p>
                                 </div>
-                                <div className="text-center" onClick={(e) =>{setTab("Equipos");setMostrar(true)}}>
+                                <div className="text-center" onClick={() =>{setTab("Equipos");setMostrar(true)}}>
                                     <p className="p-3 pb-0 text-lg">Equipos</p>
                                     <p className="text-2xl">{usuario?.equipos?.length || 0}</p>
                                 </div>

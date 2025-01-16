@@ -1,6 +1,5 @@
 "use client";
 import { FC, useEffect, useState, ReactNode } from "react";
-import { verificarId } from "../lib/usuarios";
 import { useRouter } from "next/navigation";
 import { verificar } from "../funciones";
 

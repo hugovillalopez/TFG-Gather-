@@ -3,9 +3,10 @@
 import { buscarUsuarioId, verificar } from "@/app/funciones";
 import { apuntarseEquipo, fetchEquipoByNombre } from "@/app/lib/equipos";
 import { fetchUsuariosByUsername } from "@/app/lib/usuarios";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect,  useState } from "react";
 
 export default function AniadirMiembro({onClose}){
     const [usuarioLogueado,setUsuarioLogueado] = useState({})
@@ -104,7 +105,7 @@ export default function AniadirMiembro({onClose}){
                                 <div key={usuario._id} className="p-3 lg:flex items-center justify-between border-t cursor-pointer hover:bg-orange-400 hover:text-black">
                                     <Link  href={`/dashboard/user/${usuario.username}`}>
                                     <div className="flex items-center">
-                                    <img className={`rounded-full h-10 w-10 border border-orange-400`} src={usuario.foto || "/images/users.webp"}/>
+                                    <Image alt="fotoPerfil" width="40" height="40" className={`rounded-full h-10 w-10 border border-orange-400`} src={usuario.foto || "/images/users.webp"}/>
                                     <div className="ml-2 flex flex-col">
                                         <div className="text-slate-800 dark:text-gray-300 font-semibold"> {usuario.username}</div>
                                         <div className="text-slate-600 text-sm dark:text-gray-500">{usuario.nombre} {usuario.apellido}</div>
@@ -112,7 +113,7 @@ export default function AniadirMiembro({onClose}){
                                 </div> 
                                 </Link>
                                 
-                                <button type="submit" className="mt-2 lg:mt-0 w-full h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{gestionarMiembro(usuario._id,false)}}>Añadir Miembro</button>
+                                <button type="submit" className="mt-2 lg:mt-0 w-full h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={() =>{gestionarMiembro(usuario._id,false)}}>Añadir Miembro</button>
                             </div>
                             ) 
                             

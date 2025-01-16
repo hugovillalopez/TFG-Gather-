@@ -8,6 +8,7 @@ import { useEffect, useState } from "react"
 import AniadirMiembro from "./anadirMiembros";
 import { fetchQuedadasPorEquipo } from "@/app/lib/quedadas";
 import EditarEquipo from "./editarEquipo";
+import Image from "next/image";
 
 
 export default function Equipo() {
@@ -147,7 +148,7 @@ export default function Equipo() {
         <MantineProvider>
             <div className="h-auto">
                 <div className="flex items-center text-xl border-b pb-4 dark:bg-gray-700 bg-gray-300 p-5">
-                    <img className={`rounded-full lg:h-14 lg:w-14 h-10 w-10 p-1 lg:mr-5 ${!Equipo.foto ? "border" : ""}`} src={Equipo.foto || "/images/users.webp"}/>
+                    <Image alt="foto" width="40" height="40" className={`rounded-full lg:h-14 lg:w-14 h-10 w-10 p-1 lg:mr-5 ${!Equipo.foto ? "border" : ""}`} src={Equipo.foto || "/images/users.webp"}/>
                     <div className="justify-between items-center w-full flex">
                         <h1 className="dark:text-gray-200 text-black">{Equipo.nombre}</h1> 
                         {Object.keys(Equipo).length != 0 && Equipo.admins.includes(usuarioLogueado._id) && 
@@ -201,14 +202,14 @@ export default function Equipo() {
                         <Tabs.Panel value="Miembros">
                             <div className="justify-center grid place-items-center sm:flex">
                                 {Object.keys(Equipo).length == 0 ? "" : (!Equipo.admins.includes(usuarioLogueado._id) ? "" : (
-                                    <button type="submit" className="flex items-center m-2 text-black h-8 px-2 text-sm lg:text-md font-bold bg-green-400  rounded-lg hover:bg-green-300 " onClick={(e) =>{setMostrarAniadir(true)}}>
+                                    <button type="submit" className="flex items-center m-2 text-black h-8 px-2 text-sm lg:text-md font-bold bg-green-400  rounded-lg hover:bg-green-300 " onClick={() =>{setMostrarAniadir(true)}}>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-1">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                         </svg>
                                         Añadir Miembros
                                     </button>
                                 ))}
-                                <button type="submit" className="flex items-center m-2 text-black h-8 px-3 text-sm lg:text-md font-bold bg-red-400 text-gray-800 rounded-lg hover:bg-red-300" onClick={(e) =>{gestionarMiembro(usuarioLogueado._id,true);router.push("/dashboard/equipos")}}>
+                                <button type="submit" className="flex items-center m-2 text-black h-8 px-3 text-sm lg:text-md font-bold bg-red-400 text-gray-800 rounded-lg hover:bg-red-300" onClick={() =>{gestionarMiembro(usuarioLogueado._id,true);router.push("/dashboard/equipos")}}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5 mr-1">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                                     </svg>
@@ -221,7 +222,7 @@ export default function Equipo() {
                                     <div key={usuario._id} className="sm:p-3 p-2 sm:flex items-center sm:justify-between border-t dark:border-white border-black cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                                         <Link  href={`/dashboard/user/${usuario.username}`}  className="w-full">
                                             <div className="flex items-center">
-                                                <img className="rounded-full h-10 w-10 border border-orange-400" src={usuario.foto || "/images/users.webp"}/>
+                                                <Image alt="foto" width="40" height="40" className="rounded-full h-10 w-10 border border-orange-400" src={usuario.foto || "/images/users.webp"}/>
                                                 <div className="ml-2 flex flex-col">
                                                     <div className="flex text-slate-800 dark:text-gray-300 font-semibold"> 
                                                         {usuario.username}
@@ -238,12 +239,12 @@ export default function Equipo() {
                                         {usuario._id != usuarioLogueado._id ? (
                                             <div className="flex items-center w-full justify-end">
                                                 {Equipo.creador != usuario._id ? (Equipo.admins.includes(usuario._id) ? (
-                                                    <button type="submit" className="text-green-400 m-2 h-8 px-3 text-sm sm:text-md font-bold border border-green-400   rounded-xl hover:bg-green-100 " onClick={(e) =>{adminsMiembro(usuario._id,true)}}>Quitar Admin</button>
+                                                    <button type="submit" className="text-green-400 m-2 h-8 px-3 text-sm sm:text-md font-bold border border-green-400   rounded-xl hover:bg-green-100 " onClick={() =>{adminsMiembro(usuario._id,true)}}>Quitar Admin</button>
                                                 ) : (
-                                                    <button type="submit" className="text-black m-2 h-8 px-3 text-sm sm:text-md font-bold bg-green-400  rounded-xl hover:bg-green-100 " onClick={(e) =>{adminsMiembro(usuario._id,false)}}>Hacer Admin</button>
+                                                    <button type="submit" className="text-black m-2 h-8 px-3 text-sm sm:text-md font-bold bg-green-400  rounded-xl hover:bg-green-100 " onClick={() =>{adminsMiembro(usuario._id,false)}}>Hacer Admin</button>
                                                 )) : ""}
                                                 {Equipo.creador != usuario._id ? (
-                                                    <button type="submit" className="text-black m-2 h-8 px-3 text-sm sm:text-md font-bold bg-red-400 text-gray-800 rounded-xl hover:bg-red-100" onClick={(e) =>{gestionarMiembro(usuario._id,true)}}>Echar del Equipo</button>
+                                                    <button type="submit" className="text-black m-2 h-8 px-3 text-sm sm:text-md font-bold bg-red-400 text-gray-800 rounded-xl hover:bg-red-100" onClick={() =>{gestionarMiembro(usuario._id,true)}}>Echar del Equipo</button>
                                                 ) : ""}
                                                 
                                             </div>
@@ -260,7 +261,7 @@ export default function Equipo() {
                                     <div key={usuario._id} className="p-3 flex items-center justify-between border-t dark:border-white border-black cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                                         <Link  href={`/dashboard/user/${usuario.username}`}  className="w-full">
                                             <div className="flex items-center">
-                                                <img className="rounded-full h-10 w-10 border border-orange-400" src={usuario.foto || "/images/users.webp"}/>
+                                                <Image alt="foto" width="40" height="40" className="rounded-full h-10 w-10 border border-orange-400" src={usuario.foto || "/images/users.webp"}/>
                                                 <div className="ml-2 flex flex-col">
                                                     <div className="flex text-slate-800 dark:text-gray-300 font-semibold"> 
                                                         {usuario.username}
@@ -271,8 +272,8 @@ export default function Equipo() {
                                         </Link>
                                         {Object.keys(Equipo).length == 0 ? "" : (!Equipo.admins.includes(usuarioLogueado._id) ? "" : (
                                         <div className="flex">
-                                            <button type="submit" className="h-8 mr-1 px-3 text-md font-bold bg-green-400 text-gray-800 border border-green-600 rounded-xl hover:bg-green-100  hover:border-green-600" onClick={(e) =>{gestionarMiembro(usuario._id,false)}}>Aceptar</button>
-                                            <button type="submit" className="h-8 px-3 text-md font-bold bg-red-400 text-gray-800 border border-red-600 rounded-xl hover:bg-red-100  hover:border-red-600" onClick={(e) =>{gestionarSolicitudes(usuario._id,false)}}>Denegar</button>
+                                            <button type="submit" className="h-8 mr-1 px-3 text-md font-bold bg-green-400 text-gray-800 border border-green-600 rounded-xl hover:bg-green-100  hover:border-green-600" onClick={() =>{gestionarMiembro(usuario._id,false)}}>Aceptar</button>
+                                            <button type="submit" className="h-8 px-3 text-md font-bold bg-red-400 text-gray-800 border border-red-600 rounded-xl hover:bg-red-100  hover:border-red-600" onClick={() =>{gestionarSolicitudes(usuario._id,false)}}>Denegar</button>
                                         </div>
                                         ))}
                                     </div>

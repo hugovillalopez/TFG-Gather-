@@ -9,7 +9,16 @@ const nextConfig: NextConfig = {
       },
     
     ];
-  }
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'gather-7308.s3.eu-north-1.amazonaws.com', // El dominio de S3
+        pathname: '/uploads/**', // Puedes agregar una ruta específica si es necesario
+      },
+    ],
+  },
 }
 
 export default nextConfig;

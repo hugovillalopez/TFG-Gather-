@@ -35,7 +35,7 @@ export default function CrearEquipo({onClose}){
         }
 
         let error = false
-        let erroresTemp = {}
+        const erroresTemp = {}
 
         if(datos.nombre.match(/^[A-Za-z\d@$!%*#?&-+\s]+$/) == null || datos.nombre == ""){
             error = true

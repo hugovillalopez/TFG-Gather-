@@ -1,11 +1,12 @@
 "use client";
-import { FC, useEffect, useState } from "react"
+import {useEffect, useState } from "react"
 
-import { fetchQuedadaById, fetchQuedadas, fetchQuedadasUsuarios } from "../lib/quedadas";
+import { fetchQuedadaById, fetchQuedadasUsuarios } from "../lib/quedadas";
 import Link from "next/link";
-import { fetchUsuarioById, verificarId } from "../lib/usuarios";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { buscarUsuarioId, verificar } from "../funciones";
+import Image from "next/image";
 
 
 
@@ -115,7 +116,6 @@ export default function MainPage(){
                 const token = sessionStorage.getItem("token");
                 if (token) {
                     verificar(token).then(dato =>{
-                        console.log(dato)
                         buscarUsuarioId(dato.usuario.id).then(dato =>{
                             setUsuarioLogueado(dato)
                         })
@@ -189,7 +189,7 @@ export default function MainPage(){
                         <div className="items-center justify-between flex text-left py-2 border-b border-orange-400">
                             <div>
                                 <Link href={`/dashboard/user/${quedada.user.username}`}>
-                                    <img src={quedada.user.foto} alt="avatar" className=" m-1 inline-block relative object-cover object-center !rounded-full w-8 h-8" />
+                                    <Image width="40" height="40" src={quedada.user.foto} alt="avatar" className=" m-1 inline-block relative object-cover object-center !rounded-full w-8 h-8" />
                                     {quedada.user.username}
                                 </Link>
                             </div>

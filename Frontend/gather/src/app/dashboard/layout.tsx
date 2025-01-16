@@ -3,18 +3,18 @@ import '@mantine/core/styles.css'
 import Link from "next/link";
 import {ProtectedRoute} from '../dashboard/protectedRoutes';
 import '../globals.css'
-import { Grid, MantineProvider } from '@mantine/core';
 import Menu from './menu';
 import Buscador from './buscador';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { buscarUsuarioId, verificar } from '../funciones';
+import Image from 'next/image';
 
 export default function DashboardLayout({
   children,}: Readonly<{children: React.ReactNode;}>) {
 
     const [usuarioLogueado, setUsuarioLogueado] = useState({});
-    let pathname = usePathname()
+    const pathname = usePathname()
     const router = useRouter()
 
     useEffect(() => {         
@@ -37,11 +37,13 @@ export default function DashboardLayout({
           <div className="flex w-full flex-wrap items-center justify-between lg:px-3">
             <div>
               <Link className="lg:mx-2 my-1 flex items-center lg:mb-0 lg:mt-0" href="/dashboard">
-                <img
+                <Image
                   id="logo"
                   className="lg:me-2"
                   src="/images/gatherLogo.png"
                   alt="TE Logo"
+                  width="40"
+                  height="40"
                   loading="lazy" />
                 <span className="text-black dark:text-white text-sm hidden md:block">GATHER</span>
               </Link>
@@ -49,7 +51,7 @@ export default function DashboardLayout({
             <div className='mr-5 lg:hidden'>
               <Link href={`/dashboard/user/${usuarioLogueado.username}`}>
                 <div className=" flex items-center items-center text-left gap-4">
-                    <img src={usuarioLogueado.foto || "/images/users.webp"} alt="avatar" className="border border-orange-400 inline-block relative object-cover object-center !rounded-full w-8 h-8" />
+                    <Image width="40" height="40" src={usuarioLogueado.foto || "/images/users.webp"} alt="avatar" className="border border-orange-400 inline-block relative object-cover object-center !rounded-full w-8 h-8" />
                     <div className="justify-start">
                       <h6 className="text-slate-800 dark:text-gray-300 font-semibold hover:text-orange-400">
                           {usuarioLogueado.username}
@@ -75,7 +77,7 @@ export default function DashboardLayout({
                 <Menu />
               </div>
 
-              <div className={`overflow-auto h-full lg:ml-10 mb-10 lg:mb-0  rounded  shadow-lg dark:bg-gray-800 bg-gray-200  ${!pathname.startsWith("/dashboard/quedadas/") && !pathname.startsWith("/dashboard/explorar")? "md:col-span-6" : "lg:col-span-9 md:col-span-9 lg:mr-5"} `}>
+              <div className={`overflow-auto h-full lg:ml-10 mb-10 lg:mb-0  rounded  shadow-lg dark:bg-gray-800 bg-gray-200  ${!pathname.startsWith("/dashboard/quedadas/") && !pathname.startsWith("/dashboard/explorar")? "md:col-span-6" : "lg:col-span-9 md:col-span-9 sm:mr-5"} `}>
                 {children}
               </div>
 

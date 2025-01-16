@@ -6,6 +6,7 @@ import { fetchUsuariosByUsername } from "@/app/lib/usuarios";
 import { MantineProvider, Tabs } from "@mantine/core";
 import Link from "next/link";
 import { useEffect, useState } from "react"
+import Image from "next/image";
 
 
 export default function Explorar(){
@@ -106,7 +107,7 @@ export default function Explorar(){
                                     <div key={usuario._id} className="p-3 flex items-center justify-between border-t cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                                         <Link  href={`/dashboard/user/${usuario.username}`}  className="w-full">
                                         <div className="flex items-center">
-                                            <img className="rounded-full h-10 w-10 border border-orange-400" src={usuario.foto || "/images/users.webp"}/>
+                                            <Image alt="foto" width="40" height="40" className="rounded-full h-10 w-10 border border-orange-400" src={usuario.foto || "/images/users.webp"}/>
                                             <div className="ml-2 flex flex-col">
                                                 <div className="text-slate-800 dark:text-gray-300 font-semibold"> {usuario.username}</div>
                                                 <div className="text-slate-600 text-sm dark:text-gray-500">{usuario.nombre} {usuario.apellido}</div>
@@ -115,9 +116,9 @@ export default function Explorar(){
                                         </Link>
                                         {usuario._id != usuarioLogueado._id ? (
                                             usuarioLogueado.seguidos?.includes(usuario._id) ? (
-                                                <button type="submit" className="h-8 px-3 text-md font-bold text-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{handleClick(usuario._id,true)}}>Siguiendo</button>
+                                                <button type="submit" className="h-8 px-3 text-md font-bold text-orange-400 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={() =>{handleClick(usuario._id,true)}}>Siguiendo</button>
                                             ) : (
-                                                <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{handleClick(usuario._id,false)}}>Seguir</button>
+                                                <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={() =>{handleClick(usuario._id,false)}}>Seguir</button>
                                             )
                                         ) : ""}
                                         
@@ -155,16 +156,16 @@ export default function Explorar(){
                                     usuarioLogueado.equipos.includes(equipo._id) ? (<p>No se han encontrado equipos</p>): (
                                         <div key={equipo._id} className="p-3 flex items-center justify-between border-t cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                                             <div className="flex items-center">
-                                                <img className="rounded-full h-10 w-10 border border-orange-400" src={equipo.foto || "/images/users.webp"}/>
+                                                <Image alt="foto" width="40" height="40" className="rounded-full h-10 w-10 border border-orange-400" src={equipo.foto || "/images/users.webp"}/>
                                                 <div className="ml-2 flex flex-col">
                                                     <div className="text-slate-800 dark:text-gray-300 font-semibold">{equipo.nombre}</div>
                                                 </div>
                                             </div> 
                                             <div>
                                                 {usuarioLogueado.solicitudes.includes(equipo._id)? (
-                                                    <button type="submit" className="text-green-400 border border-green-400 h-8 px-3 text-md font-bold bg-trasparent  rounded-xl hover:bg-green-100 " onClick={(e) =>{solicitarUnion(equipo._id,false)}}>Quitar Solicitud</button>    
+                                                    <button type="submit" className="text-green-400 border border-green-400 h-8 px-3 text-md font-bold bg-trasparent  rounded-xl hover:bg-green-100 " onClick={() =>{solicitarUnion(equipo._id,false)}}>Quitar Solicitud</button>    
                                                 ) : (
-                                                    <button type="submit" className="text-black h-8 px-3 text-md font-bold bg-green-400  rounded-xl hover:bg-green-100 " onClick={(e) =>{solicitarUnion(equipo._id,true)}}>Solicitar Union</button>    
+                                                    <button type="submit" className="text-black h-8 px-3 text-md font-bold bg-green-400  rounded-xl hover:bg-green-100 " onClick={() =>{solicitarUnion(equipo._id,true)}}>Solicitar Union</button>    
                                                 )}
                                                 
                                             </div>   

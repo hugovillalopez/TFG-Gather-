@@ -1,8 +1,6 @@
 "use client";
 import { buscarUsuario, buscarUsuarioId, convertirAFormData, verificar } from "@/app/funciones";
-import { actualizarFotoUsuario, cambiarPassword, fetchUsuarioById, fetchUsuarioByUsername, seguir, updateUsuario } from "@/app/lib/usuarios"
-import { MantineProvider, Tabs } from "@mantine/core"
-import Link from "next/link";
+import { actualizarFotoUsuario, cambiarPassword, updateUsuario } from "@/app/lib/usuarios"
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 
@@ -54,7 +52,7 @@ export default function EditarPerfil({onClose}){
         }
 
         let error = false
-        let erroresTemp = {}
+        const erroresTemp = {}
 
         Object.keys(datos).forEach((e) =>{
             
@@ -149,7 +147,6 @@ export default function EditarPerfil({onClose}){
         }
 
         let error = false
-        let erroresTemp = {}
 
         Object.keys(datos).forEach((e) =>{
             switch (e) {

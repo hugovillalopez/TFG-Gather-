@@ -1,17 +1,17 @@
 "use client";
 import { apuntarse, deleteQuedada, fetchQuedadaById } from "@/app/lib/quedadas"
 import { useParams, useRouter } from "next/navigation"
-import { useContext, useEffect, useState } from "react"
-import { ProtectedRoute } from "../../protectedRoutes"
-import { fetchUsuarioById, verificarId } from "@/app/lib/usuarios"
+import { useEffect, useState } from "react"
 import Link from "next/link";
 import EditarGather from "./editarQuedada";
 import { buscarUsuarioId, fetchUsuarios, verificar } from "@/app/funciones";
 import MapComponent from "@/app/maps";
+import { ProtectedRoute } from "../../protectedRoutes";
+import Image from "next/image";
 
 
 
-export default function verQuedada (){
+export default function VerQuedada (){
     const router = useRouter()
     const params = useParams()
     const {quedada} = params
@@ -47,7 +47,7 @@ export default function verQuedada (){
 
     const eliminarQuedada = async (id) =>{
         try {
-            const response = await deleteQuedada(id,usuarioLogueado._id)
+            await deleteQuedada(id,usuarioLogueado._id)
             router.push("/dashboard")
         } catch (error) {
             console.log(error.message)
@@ -161,7 +161,7 @@ export default function verQuedada (){
                                     <div key={usuario._id} className="p-3 flex items-center justify-between border-t dark:border-white border-black cursor-pointer hover:bg-gray-300 hover:dark:bg-gray-700 hover:text-black">
                                         <Link  href={`/dashboard/user/${usuario.username}`}>
                                         <div className="flex items-center">
-                                            <img className="rounded-full h-10 w-10" src={usuario.foto}/>
+                                            <Image alt="fotoPerfil" width="40" height="40" className="rounded-full h-10 w-10" src={usuario.foto}/>
                                             <div className="ml-2 flex flex-col">
                                                 <div className="text-slate-800 dark:text-gray-300 font-semibold"> {usuario.username}</div>
                                                 <div className="text-slate-600 text-sm dark:text-gray-500">{usuario.nombre} {usuario.apellido}</div>
@@ -170,9 +170,9 @@ export default function verQuedada (){
                                         </Link>
                                         {usuario._id != usuarioLogueado._id ? (
                                             usuarioLogueado.seguidos?.includes(usuario._id) ? (
-                                                <button type="submit" className="h-8 px-3 text-md font-bold text-orange-200 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{dejarSeguirUsuario(usuario._id);window.location.reload()}}>Siguiendo</button>
+                                                <button type="submit" className="h-8 px-3 text-md font-bold text-orange-200 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={() =>{dejarSeguirUsuario(usuario._id);window.location.reload()}}>Siguiendo</button>
                                             ) : (
-                                                <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={(e) =>{seguirUsuario(usuario._id);window.location.reload()}}>Seguir</button>
+                                                <button type="submit" className="h-8 px-3 text-md font-bold bg-orange-400 text-gray-800 border border-orange-600 rounded-xl hover:bg-orange-100 hover:text-orange-400 hover:border-orange-100" onClick={() =>{seguirUsuario(usuario._id);window.location.reload()}}>Seguir</button>
                                             )
                                         ) : ""}
                                     </div>
