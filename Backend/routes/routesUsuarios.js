@@ -18,8 +18,8 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 const s3Client = new S3Client({
     region: 'eu-north-1',
     credentials: {
-      accessKeyId: 'AKIA3ISBVXXIWGW6AROY',
-      secretAccessKey: '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',
+      accessKeyId: '',
+      secretAccessKey: '',
     },
 })
 // Crear una instancia de S3
